@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { Activity, ArrowRight, ClipboardList, FlaskConical, HeartPulse, Hospital, Pill, ShieldCheck, Stethoscope, Users, Workflow } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { JourneyStrip, WorkflowSteps } from "@/components/care-sync/WorkflowSteps";
