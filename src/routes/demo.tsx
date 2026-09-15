@@ -1,19 +1,28 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
-  Users,
-  Stethoscope,
-  HeartPulse,
-  FlaskConical,
-  Pill,
-  ClipboardList,
+  Activity,
   ArrowRight,
-  ShieldAlert,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  FlaskConical,
+  LayoutDashboard,
+  LucideIcon,
+  Moon,
+  Pill,
   RotateCcw,
+  Sparkles,
+  Stethoscope,
+  Sun,
+  User,
+  UserCheck,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/care-sync/Logo";
 import { SectionLabel } from "@/components/care-sync/SectionLabel";
+import { useTheme } from "@/components/care-sync/ThemeToggle";
 import { useCareSync } from "@/lib/store";
 import { DEMO_USERS } from "@/lib/mockData";
 import { Role } from "@/types/caresync";
@@ -32,7 +41,7 @@ const rolesList: {
   role: Role;
   title: string;
   emoji: string;
-  icon: any;
+  icon: LucideIcon;
   user: (typeof DEMO_USERS)[Role];
   path: string;
   description: string;
@@ -108,20 +117,34 @@ const rolesList: {
 
 function DemoRoleSelectionPage() {
   const { setRole, resetToDefault } = useCareSync();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleSelectRole = (role: Role, path: string) => {
     setRole(role);
-    navigate({ to: path as any });
+    navigate({ to: path });
   };
 
   return (
-    <div className="min-h-screen bg-surf text-foreground flex flex-col">
+    <div className="min-h-screen bg-surf text-foreground flex flex-col selection:bg-brand/20">
       {/* Header */}
-      <header className="border-b border-border bg-card/80 backdrop-blur-xl">
+      <header className="border-b border-border bg-card/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo />
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="h-8 w-8 text-ink/70 hover:text-ink hover:bg-surf"
+              title={`Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} Mode`}
+            >
+              {resolvedTheme === "dark" ? (
+                <Sun className="size-4 text-warn" />
+              ) : (
+                <Moon className="size-4 text-brand" />
+              )}
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -129,11 +152,11 @@ function DemoRoleSelectionPage() {
                 resetToDefault();
                 alert("Demo state reset to initial prototype baseline.");
               }}
-              className="border-border text-xs text-ink/70"
+              className="border-border text-xs text-ink/70 h-8"
             >
               <RotateCcw className="size-3.5 mr-1" /> Reset Demo Data
             </Button>
-            <Button asChild variant="ghost" size="sm" className="text-xs">
+            <Button asChild variant="ghost" size="sm" className="text-xs h-8 text-ink/70">
               <Link to="/login">Sign In View</Link>
             </Button>
           </div>

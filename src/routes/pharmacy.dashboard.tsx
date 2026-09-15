@@ -63,7 +63,8 @@ function PharmacyDashboardPage() {
               Pharmacy & Medication Fulfillment
             </h1>
             <p className="text-xs text-ink/60">
-              Dispense digital prescriptions from OPD consultations, verify inventory, and notify care teams.
+              Dispense digital prescriptions from OPD consultations, verify inventory, and notify
+              care teams.
             </p>
           </div>
         </div>
@@ -76,7 +77,9 @@ function PharmacyDashboardPage() {
                 <div className="text-[11px] font-medium text-ink/60 uppercase font-mono">
                   Pending Orders
                 </div>
-                <div className="text-2xl font-bold text-warn mt-0.5">{pendingPrescriptions.length}</div>
+                <div className="text-2xl font-bold text-warn mt-0.5">
+                  {pendingPrescriptions.length}
+                </div>
                 <div className="text-[10px] text-ink/45 mt-0.5">Awaiting fulfillment</div>
               </div>
               <div className="size-9 rounded-md bg-warn/15 text-warn grid place-items-center">
@@ -91,7 +94,9 @@ function PharmacyDashboardPage() {
                 <div className="text-[11px] font-medium text-ink/60 uppercase font-mono">
                   Orders Today
                 </div>
-                <div className="text-2xl font-bold text-brand mt-0.5">{prescriptions.length + 6}</div>
+                <div className="text-2xl font-bold text-brand mt-0.5">
+                  {prescriptions.length + 6}
+                </div>
                 <div className="text-[10px] text-ink/45 mt-0.5">From 3 consulting doctors</div>
               </div>
               <div className="size-9 rounded-md bg-brand/10 text-brand grid place-items-center">
@@ -140,7 +145,9 @@ function PharmacyDashboardPage() {
                 <h2 className="text-sm font-bold text-ink uppercase tracking-wide">
                   Prescription Worklist Queue
                 </h2>
-                <p className="text-xs text-ink/55">Orders routed directly from doctor consultations</p>
+                <p className="text-xs text-ink/55">
+                  Orders routed directly from doctor consultations
+                </p>
               </div>
               <Badge variant="outline" className="text-xs font-mono">
                 {pendingPrescriptions.length} Pending
@@ -192,7 +199,9 @@ function PharmacyDashboardPage() {
                             <div className="text-ink/60 text-[10px]">{item.instructions}</div>
                           </div>
                           <div className="text-right font-mono">
-                            <div className="text-brand font-medium text-[11px]">{item.frequency}</div>
+                            <div className="text-brand font-medium text-[11px]">
+                              {item.frequency}
+                            </div>
                             <div className="text-ink/50 text-[10px]">{item.duration}</div>
                           </div>
                         </div>
@@ -214,7 +223,8 @@ function PharmacyDashboardPage() {
                         </Button>
                       ) : (
                         <div className="flex items-center gap-1.5 text-xs text-calm font-semibold font-mono">
-                          <CheckCircle2 className="size-3.5" /> Dispensed at {rx.dispensedAt || "Recent"}
+                          <CheckCircle2 className="size-3.5" /> Dispensed at{" "}
+                          {rx.dispensedAt || "Recent"}
                         </div>
                       )}
                     </div>

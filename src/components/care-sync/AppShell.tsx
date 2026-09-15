@@ -15,15 +15,15 @@ import {
   UserCheck,
   Building2,
   CalendarCheck,
-  Sparkles,
-  Settings,
-  Bell,
-  Clock,
+  Calendar,
+  FileText,
+  CreditCard,
   Bed,
   Sun,
   Moon,
-  ChevronDown,
+  ChevronRight,
   ShieldAlert,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,8 +46,10 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { currentRole, currentUser, setRole, prescriptions, testOrders, patients } = useCareSync();
-  const { theme, resolvedTheme, toggleTheme } = useTheme();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const location = useLocation();
+
+  const role = activeRole || currentRole;
 
   const pendingLabCount = testOrders.filter(
     (t) => t.status === "Pending" || t.status === "In Progress",
@@ -55,100 +57,153 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
   const pendingRxCount = prescriptions.filter((p) => p.status === "Pending").length;
   const waitingPatientsCount = patients.filter((p) => p.status === "Waiting").length;
 
-  const roleNavItems = [
-    {
-      label: "Overview / Doctor",
-      path: "/doctor/dashboard",
-      icon: Stethoscope,
-      badge: waitingPatientsCount ? `${waitingPatientsCount} wait` : undefined,
-      roleKey: "doctor",
-    },
-    {
-      label: "Patients & Charts",
-      path: "/doctor/patient/$id",
-      icon: Users,
-      params: { id: "CS-001" },
-      roleKey: "doctor",
-    },
-    {
-      label: "Consultations",
-      path: "/doctor/consultation",
-      icon: CalendarCheck,
-      roleKey: "doctor",
-    },
-    {
-      label: "Laboratory & Tests",
-      path: "/lab/dashboard",
-      icon: FlaskConical,
-      badge: pendingLabCount ? `${pendingLabCount}` : undefined,
-      roleKey: "lab",
-    },
-    {
-      label: "Pharmacy & Dispensing",
-      path: "/pharmacy/dashboard",
-      icon: Pill,
-      badge: pendingRxCount ? `${pendingRxCount}` : undefined,
-      roleKey: "pharmacy",
-    },
-    {
-      label: "Nursing & Inpatients",
-      path: "/nurse/dashboard",
-      icon: HeartPulse,
-      roleKey: "nurse",
-    },
-    {
-      label: "Surgery & OT",
-      path: "/surgery",
-      icon: Activity,
-      roleKey: "doctor",
-    },
-    {
-      label: "Reception & Admissions",
-      path: "/receptionist/dashboard",
-      icon: ClipboardList,
-      roleKey: "receptionist",
-    },
-    {
-      label: "Patient Portal",
-      path: "/patient/dashboard",
-      icon: UserCheck,
-      roleKey: "patient",
-    },
-  ];
+  // Role-Specific Navigation Definitions
+  const getNavItemsForRole = (r: Role) => {
+    switch (r) {
+      case "patient":
+        return [
+          { label: "My Health Home", path: "/patient/dashboard", icon: LayoutDashboard },
+          { label: "Appointments", path: "/patient/dashboard", icon: Calendar, badge: "Upcoming" },
+          {
+            label: "Prescriptions",
+            path: "/patient/dashboard",
+            icon: Pill,
+            badge: `${prescriptions.filter((p) => p.patientId === "CS-001").length}`,
+          },
+          {
+            label: "Lab Reports",
+            path: "/patient/dashboard",
+            icon: FlaskConical,
+            badge: `${testOrders.filter((t) => t.patientId === "CS-001").length}`,
+          },
+          { label: "Billing & Insurance", path: "/patient/dashboard", icon: CreditCard },
+          { label: "Care Timeline", path: "/patient/dashboard", icon: Activity },
+        ];
+      case "doctor":
+        return [
+          {
+            label: "OPD Queue & Hub",
+            path: "/doctor/dashboard",
+            icon: Stethoscope,
+            badge: waitingPatientsCount ? `${waitingPatientsCount} wait` : undefined,
+          },
+          {
+            label: "Active Patient Chart",
+            path: "/doctor/patient/$id",
+            params: { id: "CS-001" },
+            icon: Users,
+          },
+          { label: "Consultation & Rx", path: "/doctor/consultation", icon: CalendarCheck },
+          {
+            label: "Diagnostic Orders",
+            path: "/lab/dashboard",
+            icon: FlaskConical,
+            badge: pendingLabCount ? `${pendingLabCount}` : undefined,
+          },
+          { label: "Surgery & OT Track", path: "/surgery", icon: Activity },
+        ];
+      case "nurse":
+        return [
+          {
+            label: "Ward & Inpatients",
+            path: "/nurse/dashboard",
+            icon: HeartPulse,
+            badge: "Ward 3B",
+          },
+          {
+            label: "Patient Bed Chart",
+            path: "/doctor/patient/$id",
+            params: { id: "CS-001" },
+            icon: Users,
+          },
+          { label: "Surgery Recovery", path: "/surgery", icon: Activity },
+        ];
+      case "lab":
+        return [
+          {
+            label: "Diagnostic Queue",
+            path: "/lab/dashboard",
+            icon: FlaskConical,
+            badge: pendingLabCount ? `${pendingLabCount} tests` : undefined,
+          },
+          {
+            label: "Patient Requisitions",
+            path: "/doctor/patient/$id",
+            params: { id: "CS-001" },
+            icon: Users,
+          },
+        ];
+      case "pharmacy":
+        return [
+          {
+            label: "Prescription Queue",
+            path: "/pharmacy/dashboard",
+            icon: Pill,
+            badge: pendingRxCount ? `${pendingRxCount} pending` : undefined,
+          },
+          {
+            label: "Patient Medication Chart",
+            path: "/doctor/patient/$id",
+            params: { id: "CS-001" },
+            icon: Users,
+          },
+        ];
+      case "receptionist":
+        return [
+          {
+            label: "Registration & Triage",
+            path: "/receptionist/dashboard",
+            icon: ClipboardList,
+            badge: `${patients.length} today`,
+          },
+          {
+            label: "Patient Directory",
+            path: "/doctor/patient/$id",
+            params: { id: "CS-001" },
+            icon: Users,
+          },
+          { label: "OT & Bed Admissions", path: "/surgery", icon: Bed },
+        ];
+      default:
+        return [{ label: "Doctor Dashboard", path: "/doctor/dashboard", icon: Stethoscope }];
+    }
+  };
+
+  const currentNavItems = getNavItemsForRole(role);
 
   return (
-    <div className="min-h-screen bg-surf text-foreground flex flex-col justify-between">
+    <div className="min-h-screen bg-surf text-foreground flex flex-col justify-between selection:bg-brand/20">
       <div>
         {/* Top Header */}
-        <header className="sticky top-0 z-50 border-b border-border bg-card/95 backdrop-blur-md">
-          <div className="mx-auto flex h-14 max-w-[1536px] items-center justify-between px-3 sm:px-6">
+        <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur-md">
+          <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-3 sm:px-6">
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-ink lg:hidden h-8 w-8"
+                className="text-ink lg:hidden h-8 w-8 hover:bg-surf"
                 onClick={() => setSidebarOpen((prev) => !prev)}
-                aria-label="Toggle navigation"
+                aria-label="Toggle navigation drawer"
               >
                 {sidebarOpen ? <X className="size-4" /> : <Menu className="size-4" />}
               </Button>
               <Logo />
-              <div className="hidden md:flex items-center gap-2 pl-3 border-l border-border/70 text-xs text-ink/50">
+              <div className="hidden md:flex items-center gap-2 pl-3 border-l border-border/80 text-xs text-ink/60">
                 <Building2 className="size-3.5 text-brand" />
-                <span className="font-medium text-ink/80">Main Facility · Indiranagar</span>
+                <span className="font-medium text-ink/80">CareSync Hospital · Main Facility</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-2.5">
+            <div className="flex items-center gap-1.5 sm:gap-2.5">
               {/* Global Search Button */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="flex items-center gap-2 rounded-md bg-surf px-2.5 py-1 text-xs text-ink/65 border border-border hover:border-brand/40 shadow-2xs transition-colors"
-                title="Search patients by name or ID"
+                className="flex items-center gap-2 rounded-lg bg-surf px-2.5 py-1.5 text-xs text-ink/70 border border-border hover:border-brand/40 shadow-2xs transition-colors"
+                title="Search patients by name or ID (⌘K)"
               >
                 <Search className="size-3.5 text-brand" />
-                <span className="hidden sm:inline">Search (CS-001 / Name)...</span>
-                <kbd className="hidden sm:inline-flex rounded bg-card px-1.5 py-0.2 font-mono text-[9px] text-ink/50 border border-border">
+                <span className="hidden sm:inline">Search Patient / UHID...</span>
+                <kbd className="hidden sm:inline-flex rounded bg-card px-1.5 py-0.5 font-mono text-[9px] text-ink/50 border border-border">
                   ⌘K
                 </kbd>
               </button>
@@ -157,7 +212,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               <AIPlaceholderButton
                 label="Ask CareSync"
                 featureName="CareSync Hospital Operations Assistant"
-                className="hidden lg:flex text-xs h-8 px-2.5"
+                className="hidden xl:flex text-xs h-8 px-2.5"
               />
 
               {/* Dark / Light Mode Toggle Button */}
@@ -165,8 +220,9 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="h-8 w-8 text-ink/70 hover:text-ink"
+                className="h-8 w-8 text-ink/70 hover:text-ink hover:bg-surf"
                 title={`Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} Mode`}
+                aria-label="Toggle theme mode"
               >
                 {resolvedTheme === "dark" ? (
                   <Sun className="size-4 text-warn transition-transform hover:rotate-45" />
@@ -178,12 +234,12 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               {/* Notification Center */}
               <NotificationCenter />
 
-              {/* Role Switcher Hub Quick Link */}
+              {/* Switch Role Persona Hub Button */}
               <Button
                 asChild
                 variant="outline"
                 size="sm"
-                className="hidden sm:flex border-border text-xs font-medium h-8 px-2.5 bg-card hover:bg-surf"
+                className="hidden sm:flex border-border text-xs font-medium h-8 px-2.5 bg-card hover:bg-surf text-ink"
               >
                 <Link to="/demo">
                   <UserCheck className="size-3.5 mr-1.5 text-brand" />
@@ -191,15 +247,17 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                 </Link>
               </Button>
 
-              {/* Active Role Persona Pill */}
-              <div className="flex items-center gap-2 pl-2 border-l border-border/70">
-                <div className="size-7 rounded-md bg-brand/10 text-brand grid place-items-center font-semibold text-xs border border-brand/20">
+              {/* Active Role Persona Indicator */}
+              <div className="flex items-center gap-2 pl-2 border-l border-border/80">
+                <div className="size-7 rounded-md bg-brand/10 text-brand grid place-items-center font-bold text-xs border border-brand/20">
                   {currentUser.name.charAt(0)}
                 </div>
-                <div className="hidden xl:block text-left leading-tight">
-                  <div className="text-xs font-semibold text-ink">{currentUser.name}</div>
-                  <div className="text-[10px] font-mono text-ink/50 capitalize">
-                    {currentUser.role}
+                <div className="hidden lg:block text-left leading-tight">
+                  <div className="text-xs font-semibold text-ink truncate max-w-[120px]">
+                    {currentUser.name}
+                  </div>
+                  <div className="text-[10px] font-mono text-brand font-medium capitalize">
+                    {role}
                   </div>
                 </div>
               </div>
@@ -207,24 +265,32 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
           </div>
         </header>
 
-        {/* Main Workspace Layout */}
-        <div className="mx-auto flex w-full max-w-[1536px] flex-1">
-          {/* Refined Healthcare Operations Sidebar */}
+        {/* Workspace Shell */}
+        <div className="mx-auto flex w-full max-w-[1600px] flex-1">
+          {/* Mobile Overlay */}
+          {sidebarOpen && (
+            <div
+              onClick={() => setSidebarOpen(false)}
+              className="fixed inset-0 z-30 bg-black/40 backdrop-blur-xs lg:hidden"
+            />
+          )}
+
+          {/* Role-Specific Sidebar */}
           <aside
             className={`${
-              sidebarOpen ? "fixed inset-y-14 left-0 z-40 w-60 block shadow-2xl" : "hidden"
+              sidebarOpen ? "fixed inset-y-14 left-0 z-40 w-64 block shadow-2xl" : "hidden"
             } border-r border-border bg-card p-3 backdrop-blur-md lg:relative lg:block lg:w-56 lg:shrink-0 lg:bg-card/85 lg:shadow-none`}
           >
             <div className="flex items-center justify-between px-2 pb-2.5 pt-1 border-b border-border/60">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-ink/45">
-                Hospital Workflows
+              <div className="text-[10px] font-mono uppercase tracking-wider text-ink/50 font-semibold">
+                {role.toUpperCase()} WORKSPACE
               </div>
               <span className="size-1.5 rounded-full bg-calm" />
             </div>
 
-            <div className="mt-2.5">
-              <nav className="space-y-0.5">
-                {roleNavItems.map((item) => {
+            <div className="mt-3">
+              <nav className="space-y-1">
+                {currentNavItems.map((item) => {
                   const Icon = item.icon;
                   const isActive =
                     item.path === "/doctor/patient/$id"
@@ -234,27 +300,28 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                   return (
                     <Link
                       key={item.label}
-                      to={item.path as any}
-                      params={item.params as any}
-                      onClick={() => {
-                        if (item.roleKey) {
-                          setRole(item.roleKey as Role);
-                        }
-                        setSidebarOpen(false);
+                      to={item.path}
+                      params={item.params}
+                      activeProps={{
+                        className:
+                          "bg-brand-500/10 text-brand-700 dark:text-brand-300 font-semibold shadow-xs",
                       }}
-                      className={`flex items-center justify-between px-2.5 py-2 rounded-md text-xs font-medium transition-colors ${
-                        isActive
-                          ? "bg-brand text-primary-foreground font-semibold shadow-2xs"
-                          : "text-ink/70 hover:bg-surf hover:text-ink"
-                      }`}
+                      inactiveProps={{
+                        className:
+                          "text-surf-600 dark:text-surf-400 hover:text-surf-950 dark:hover:text-surf-100 hover:bg-surf-100 dark:hover:bg-surf-800/60",
+                      }}
+                      onClick={() => setSidebarOpen(false)}
+                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors"
                     >
-                      <div className="flex items-center gap-2">
-                        <Icon className={`size-3.5 ${isActive ? "text-white" : "text-ink/50"}`} />
+                      <div className="flex items-center gap-2.5 truncate">
+                        <Icon
+                          className={`size-4 shrink-0 ${isActive ? "text-primary-foreground" : "text-brand"}`}
+                        />
                         <span className="truncate">{item.label}</span>
                       </div>
                       {item.badge && (
                         <span
-                          className={`rounded px-1.5 py-0.2 font-mono text-[9px] ${
+                          className={`rounded px-1.5 py-0.5 font-mono text-[9px] shrink-0 ${
                             isActive
                               ? "bg-white/20 text-white"
                               : "bg-brand/10 text-brand font-medium"
@@ -269,45 +336,58 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               </nav>
             </div>
 
-            {/* Persona card at bottom of sidebar */}
-            <div className="mt-6 rounded-lg bg-surf p-2.5 border border-border">
+            {/* Quick Switch Persona Card */}
+            <div className="mt-8 rounded-xl bg-surf p-3 border border-border">
               <div className="text-[11px] font-semibold text-ink flex items-center justify-between">
-                <span>Active Persona</span>
-                <span className="size-1.5 rounded-full bg-calm" />
+                <span>Active Role</span>
+                <Badge
+                  variant="outline"
+                  className="text-[9px] font-mono capitalize bg-card border-brand/30 text-brand"
+                >
+                  {role}
+                </Badge>
               </div>
-              <div className="text-xs text-ink/85 mt-0.5 font-medium truncate">
+              <div className="text-xs text-ink/90 mt-1 font-semibold truncate">
                 {currentUser.name}
               </div>
-              <div className="text-[10px] font-mono text-ink/50 truncate">{currentUser.title}</div>
+              <div className="text-[10px] text-ink/50 font-mono truncate">{currentUser.title}</div>
               <Button
                 asChild
                 variant="outline"
                 size="sm"
-                className="mt-2 w-full text-[10px] h-6 bg-card hover:bg-card/80 border-border"
+                className="mt-2.5 w-full text-[11px] h-7 bg-card hover:bg-card/80 border-border text-ink"
               >
-                <Link to="/demo">Switch Persona</Link>
+                <Link to="/demo">
+                  <span>Switch Role</span>
+                  <ArrowRight className="size-3 ml-1" />
+                </Link>
               </Button>
             </div>
           </aside>
 
-          {/* Dynamic Main Workspace Content */}
+          {/* Main Dynamic View Area */}
           <main className="min-w-0 flex-1 p-3.5 sm:p-5 lg:p-6">{children}</main>
         </div>
       </div>
 
       {/* Hospital Footer Disclaimer */}
-      <footer className="border-t border-border bg-card py-3 px-4 text-center text-xs text-ink/55">
-        <div className="mx-auto max-w-5xl flex flex-col sm:flex-row items-center justify-between gap-1.5">
-          <span className="font-semibold text-ink/75 text-[11px]">
-            CareSync Operations Platform · First Commit Hackathon
-          </span>
-          <span className="text-[10px] text-ink/45 max-w-2xl text-center sm:text-right">
-            CareSync is a hackathon prototype created for workflow demonstration and educational purposes. It is not intended for clinical diagnosis, treatment decisions, or real patient data.
+      <footer className="border-t border-border bg-card py-3 px-4 text-xs text-ink/55">
+        <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-ink/75 text-[11px]">
+              CareSync Healthcare Operations Prototype
+            </span>
+            <span className="text-ink/30">•</span>
+            <span className="text-[10px] font-mono text-calm">Connected Digital Thread</span>
+          </div>
+          <span className="text-[10px] text-ink/45 max-w-xl text-center sm:text-right">
+            CareSync is a hackathon prototype for healthcare workflow demonstration. It is not
+            intended for clinical diagnosis, treatment decisions, or real patient data.
           </span>
         </div>
       </footer>
 
-      {/* Global Patient Search Modal */}
+      {/* Global Patient Search Modal (⌘K) */}
       <GlobalSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );

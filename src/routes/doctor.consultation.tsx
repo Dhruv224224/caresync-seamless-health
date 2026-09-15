@@ -86,21 +86,22 @@ function DoctorConsultationPage() {
   const [selectedLabTest, setSelectedLabTest] = useState("Complete Blood Count (CBC)");
   const [labPriority, setLabPriority] = useState<"Routine" | "Urgent" | "Stat">("Urgent");
 
-  const selectedPatient = patients.find((p) => p.id === selectedPatientId) || patients[0] || {
-    id: "CS-001",
-    name: "Rajesh Sharma",
-    age: 54,
-    gender: "Male" as const,
-    bloodGroup: "B+",
-    phone: "+91 98765 43210",
-    address: "Bengaluru",
-    allergies: ["Penicillin"],
-    medicalHistory: ["Hypertension"],
-    status: "Waiting" as const,
-    currentDepartment: "General Medicine",
-    assignedDoctor: "Dr. Ananya Sharma",
-    registeredAt: "08:30 AM",
-  };
+  const selectedPatient = patients.find((p) => p.id === selectedPatientId) ||
+    patients[0] || {
+      id: "CS-001",
+      name: "Rajesh Sharma",
+      age: 54,
+      gender: "Male" as const,
+      bloodGroup: "B+",
+      phone: "+91 98765 43210",
+      address: "Bengaluru",
+      allergies: ["Penicillin"],
+      medicalHistory: ["Hypertension"],
+      status: "Waiting" as const,
+      currentDepartment: "General Medicine",
+      assignedDoctor: "Dr. Ananya Sharma",
+      registeredAt: "08:30 AM",
+    };
 
   const handleAddMedicine = () => {
     setMedicines([
@@ -328,9 +329,7 @@ function DoctorConsultationPage() {
                           Fasting Blood Sugar & HbA1c
                         </SelectItem>
                         <SelectItem value="Lipid Profile">Lipid Profile</SelectItem>
-                        <SelectItem value="Chest X-Ray (PA View)">
-                          Chest X-Ray (PA View)
-                        </SelectItem>
+                        <SelectItem value="Chest X-Ray (PA View)">Chest X-Ray (PA View)</SelectItem>
                         <SelectItem value="Urinalysis Routine">Urinalysis Routine</SelectItem>
                         <SelectItem value="Ultrasound Whole Abdomen">
                           Ultrasound Whole Abdomen
@@ -341,7 +340,10 @@ function DoctorConsultationPage() {
 
                   <div className="space-y-1.5">
                     <Label className="text-xs font-medium text-ink">Priority</Label>
-                    <Select value={labPriority} onValueChange={(v: any) => setLabPriority(v)}>
+                    <Select
+                      value={labPriority}
+                      onValueChange={(v: "Routine" | "Urgent" | "Stat") => setLabPriority(v)}
+                    >
                       <SelectTrigger className="text-xs bg-surf h-8">
                         <SelectValue />
                       </SelectTrigger>

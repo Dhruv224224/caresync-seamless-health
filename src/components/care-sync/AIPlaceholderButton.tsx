@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { Sparkles, Bot, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { Sparkles, Bot, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
 interface AIPlaceholderButtonProps {
   label: string;
   featureName: string;
-  variant?: 'outline' | 'default' | 'secondary' | 'ghost';
-  size?: 'sm' | 'default' | 'lg';
+  variant?: "outline" | "default" | "secondary" | "ghost";
+  size?: "sm" | "default" | "lg";
   className?: string;
   icon?: React.ReactNode;
 }
@@ -21,9 +21,9 @@ interface AIPlaceholderButtonProps {
 export function AIPlaceholderButton({
   label,
   featureName,
-  variant = 'outline',
-  size = 'sm',
-  className = '',
+  variant = "outline",
+  size = "sm",
+  className = "",
   icon,
 }: AIPlaceholderButtonProps) {
   const [open, setOpen] = useState(false);
@@ -58,16 +58,23 @@ export function AIPlaceholderButton({
             <div className="rounded-xl bg-surf p-3.5 border border-border/80 text-xs text-ink/75 leading-relaxed flex items-start gap-2.5">
               <AlertCircle className="size-4 text-brand shrink-0 mt-0.5" />
               <div>
-                <strong>Prototype Notice:</strong> AI capabilities (such as clinical documentation summarization, simple patient explanations, and intelligent triage) are currently disabled in this hackathon prototype.
+                <strong>Prototype Notice:</strong> AI capabilities (such as clinical documentation
+                summarization, simple patient explanations, and intelligent triage) are currently
+                disabled in this hackathon prototype.
               </div>
             </div>
             <p className="text-[11px] text-ink/50 leading-normal">
-              CareSync is designed around a continuous human-in-the-loop workflow. Automated AI synthesis will be enabled in future releases after rigorous verification.
+              CareSync is designed around a continuous human-in-the-loop workflow. Automated AI
+              synthesis will be enabled in future releases after rigorous verification.
             </p>
           </div>
 
           <div className="flex justify-end pt-2 border-t border-border">
-            <Button size="sm" onClick={() => setOpen(false)} className="bg-brand text-white text-xs h-8">
+            <Button
+              size="sm"
+              onClick={() => setOpen(false)}
+              className="bg-brand text-white text-xs h-8"
+            >
               Understood
             </Button>
           </div>

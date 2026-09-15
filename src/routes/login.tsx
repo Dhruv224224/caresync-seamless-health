@@ -12,12 +12,15 @@ import {
   Zap,
   Sparkles,
   Lock,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Logo } from "@/components/care-sync/Logo";
+import { useTheme } from "@/components/care-sync/ThemeToggle";
 import { useCareSync } from "@/lib/store";
 import { Role } from "@/types/caresync";
 
@@ -36,6 +39,7 @@ function LoginPage() {
   const [password, setPassword] = useState("••••••••••••");
   const [rememberMe, setRememberMe] = useState(true);
   const { setRole } = useCareSync();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleSignIn = (e: React.FormEvent) => {
@@ -46,11 +50,28 @@ function LoginPage() {
 
   const handleQuickDemoRole = (role: Role, targetPath: string) => {
     setRole(role);
-    navigate({ to: targetPath as any });
+    navigate({ to: targetPath });
   };
 
   return (
-    <div className="min-h-screen bg-surf grid lg:grid-cols-12 text-foreground">
+    <div className="min-h-screen bg-surf grid lg:grid-cols-12 text-foreground selection:bg-brand/20">
+      {/* Top right theme toggle for public access */}
+      <div className="absolute top-4 right-4 z-50">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="h-8 w-8 text-ink/70 hover:text-ink hover:bg-card/80 backdrop-blur"
+          title={`Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} Mode`}
+        >
+          {resolvedTheme === "dark" ? (
+            <Sun className="size-4 text-warn" />
+          ) : (
+            <Moon className="size-4 text-brand" />
+          )}
+        </Button>
+      </div>
+
       {/* Left Column: Brand Hero */}
       <div className="hidden lg:flex lg:col-span-6 xl:col-span-7 bg-brand flex-col justify-between p-12 text-white relative overflow-hidden">
         <div className="pointer-events-none absolute -right-20 -bottom-20 size-[36rem] rounded-full bg-calm/10 blur-3xl" />

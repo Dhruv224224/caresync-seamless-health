@@ -181,9 +181,7 @@ export const useCareSync = () => {
     notify();
   };
 
-  const addPrescription = (
-    prescription: Omit<Prescription, "id" | "createdAt" | "status">,
-  ) => {
+  const addPrescription = (prescription: Omit<Prescription, "id" | "createdAt" | "status">) => {
     const id = `RX-${Math.floor(100 + Math.random() * 900)}`;
     const newPrescription: Prescription = {
       ...prescription,
@@ -261,9 +259,7 @@ export const useCareSync = () => {
     globalState = {
       ...globalState,
       prescriptions: globalState.prescriptions.map((p) =>
-        p.id === prescriptionId
-          ? { ...p, status: "Dispensed", dispensedAt: "Just now" }
-          : p,
+        p.id === prescriptionId ? { ...p, status: "Dispensed", dispensedAt: "Just now" } : p,
       ),
       notifications: [notif, ...globalState.notifications],
       timelines: {
@@ -274,9 +270,7 @@ export const useCareSync = () => {
     notify();
   };
 
-  const addTestOrder = (
-    order: Omit<TestOrder, "id" | "orderedAt" | "status">,
-  ) => {
+  const addTestOrder = (order: Omit<TestOrder, "id" | "orderedAt" | "status">) => {
     const id = `LAB-${Math.floor(800 + Math.random() * 200)}`;
     const newOrder: TestOrder = {
       ...order,

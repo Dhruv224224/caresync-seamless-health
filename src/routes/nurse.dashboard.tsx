@@ -156,7 +156,9 @@ function NurseDashboardPage() {
             <h2 className="text-sm font-bold text-ink uppercase tracking-wide">
               Active Ward Inpatients
             </h2>
-            <span className="text-xs font-mono text-ink/50">{admittedPatients.length} Active Beds</span>
+            <span className="text-xs font-mono text-ink/50">
+              {admittedPatients.length} Active Beds
+            </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -252,8 +254,7 @@ function NurseDashboardPage() {
                 Record Vitals — {selectedPatientForVitals?.name}
               </DialogTitle>
               <div className="text-xs font-mono text-ink/50 mt-1">
-                {selectedPatientForVitals?.id} ·{" "}
-                {selectedPatientForVitals?.bedNumber || "Ward Bed"}
+                {selectedPatientForVitals?.id} · {selectedPatientForVitals?.bedNumber || "Ward Bed"}
               </div>
             </DialogHeader>
 

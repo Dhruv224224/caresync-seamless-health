@@ -35,11 +35,31 @@ function SurgeryWorkflowPage() {
     scheduledDate: "2026-09-15 02:30 PM (Today)",
     status: "Pre-Op" as const,
     milestones: [
-      { title: "Admission & Bed Assignment (Ward 3B)", status: "completed" as const, timestamp: "08:30 AM" },
-      { title: "Pre-operative Clinical Assessment", status: "completed" as const, timestamp: "09:00 AM" },
-      { title: "Required Diagnostic Tests (CBC & Blood Sugar)", status: "completed" as const, timestamp: "10:15 AM" },
-      { title: "Anesthesia Clearance & Consent Signed", status: "completed" as const, timestamp: "11:30 AM" },
-      { title: "Surgery Scheduled (OT Suite 2)", status: "completed" as const, timestamp: "02:30 PM" },
+      {
+        title: "Admission & Bed Assignment (Ward 3B)",
+        status: "completed" as const,
+        timestamp: "08:30 AM",
+      },
+      {
+        title: "Pre-operative Clinical Assessment",
+        status: "completed" as const,
+        timestamp: "09:00 AM",
+      },
+      {
+        title: "Required Diagnostic Tests (CBC & Blood Sugar)",
+        status: "completed" as const,
+        timestamp: "10:15 AM",
+      },
+      {
+        title: "Anesthesia Clearance & Consent Signed",
+        status: "completed" as const,
+        timestamp: "11:30 AM",
+      },
+      {
+        title: "Surgery Scheduled (OT Suite 2)",
+        status: "completed" as const,
+        timestamp: "02:30 PM",
+      },
       { title: "Surgery in Progress", status: "in_progress" as const, timestamp: "02:45 PM" },
       { title: "Post-operative Monitoring & Recovery Care", status: "pending" as const },
       { title: "Attending Doctor Review & Rounds", status: "pending" as const },

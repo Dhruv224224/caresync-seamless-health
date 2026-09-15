@@ -106,7 +106,8 @@ function ReceptionistDashboardPage() {
               Patient Registration & Check-In
             </h1>
             <p className="text-xs text-ink/60">
-              Register incoming patients, generate digital UHIDs, and route directly to clinical queues.
+              Register incoming patients, generate digital UHIDs, and route directly to clinical
+              queues.
             </p>
           </div>
 
@@ -154,7 +155,10 @@ function ReceptionistDashboardPage() {
 
                   <div className="space-y-1">
                     <Label className="text-xs font-medium text-ink">Gender</Label>
-                    <Select value={gender} onValueChange={(v: any) => setGender(v)}>
+                    <Select
+                      value={gender}
+                      onValueChange={(v: "Male" | "Female" | "Other") => setGender(v)}
+                    >
                       <SelectTrigger className="text-xs bg-surf h-8">
                         <SelectValue />
                       </SelectTrigger>
@@ -298,7 +302,9 @@ function ReceptionistDashboardPage() {
               <CardTitle className="text-xs font-bold text-ink uppercase tracking-wider font-mono">
                 Hospital Master Directory
               </CardTitle>
-              <p className="text-xs text-ink/50">Real-time status across OPD, Lab, Pharmacy & Ward</p>
+              <p className="text-xs text-ink/50">
+                Real-time status across OPD, Lab, Pharmacy & Ward
+              </p>
             </div>
 
             <div className="relative">

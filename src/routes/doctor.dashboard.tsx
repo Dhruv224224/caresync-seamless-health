@@ -120,7 +120,9 @@ function DoctorDashboardPage() {
                 <div className="text-[11px] font-medium text-ink/60 uppercase font-mono">
                   Waiting in OPD
                 </div>
-                <div className="text-2xl font-bold text-warn mt-0.5">{waitingPatients.length + 2}</div>
+                <div className="text-2xl font-bold text-warn mt-0.5">
+                  {waitingPatients.length + 2}
+                </div>
                 <div className="text-[10px] text-ink/45 mt-0.5">Avg wait: 14 mins</div>
               </div>
               <div className="size-9 rounded-md bg-warn/15 text-warn grid place-items-center">
@@ -170,7 +172,8 @@ function DoctorDashboardPage() {
                   Next Patient in Queue
                 </div>
                 <div className="text-sm font-bold text-ink">
-                  {nextPatient.name} · UHID: {nextPatient.id} ({nextPatient.age}y, {nextPatient.gender})
+                  {nextPatient.name} · UHID: {nextPatient.id} ({nextPatient.age}y,{" "}
+                  {nextPatient.gender})
                 </div>
               </div>
             </div>
@@ -193,7 +196,9 @@ function DoctorDashboardPage() {
                 <h2 className="text-sm font-bold text-ink uppercase tracking-wide">
                   OPD Consultation Queue
                 </h2>
-                <p className="text-xs text-ink/55">Active outpatient waiting list and triage status</p>
+                <p className="text-xs text-ink/55">
+                  Active outpatient waiting list and triage status
+                </p>
               </div>
 
               <div className="relative">
