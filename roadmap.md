@@ -1,0 +1,4 @@
+- [ ] Build CareSync public landing page with workflow, features, roles, and CTAs.
+- [ ] Build fictional CareSync demo workspace with responsive navigation and patient timeline.
+- [ ] Update shared design tokens, typography, and page metadata.
+- [ ] Verify desktop/mobile rendering and preview diagnostics.
