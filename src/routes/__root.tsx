@@ -78,7 +78,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "CareSync — Connected Healthcare Workflows" },
-      { name: "description", content: "CareSync connects every department around one continuous digital patient journey." },
+      {
+        name: "description",
+        content:
+          "CareSync connects every department around one continuous digital patient journey.",
+      },
       { name: "author", content: "CareSync" },
       { property: "og:title", content: "CareSync — Connected Healthcare Workflows" },
       { property: "og:description", content: "One patient. Every department. In sync." },
@@ -92,7 +96,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap",
+      },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -116,13 +123,19 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/care-sync/ThemeToggle";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <Toaster position="top-right" richColors />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

@@ -9,8 +9,12 @@ export function Logo({ compact = false }: { compact?: boolean }) {
         <span className="absolute bottom-1.5 right-1.5 size-1.5 rounded-full bg-calm" />
       </span>
       <span className={compact ? "hidden sm:block" : "block"}>
-        <span className="block text-[15px] font-semibold leading-none tracking-tight text-ink">CareSync</span>
-        <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.14em] text-ink/45">Patient workflow</span>
+        <span className="block text-[15px] font-semibold leading-none tracking-tight text-ink">
+          CareSync
+        </span>
+        <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.14em] text-ink/45">
+          Patient workflow
+        </span>
       </span>
     </Link>
   );
