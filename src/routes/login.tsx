@@ -14,6 +14,9 @@ import {
   Lock,
   Sun,
   Moon,
+  Loader2,
+  UserPlus,
+  LogIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +24,9 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Logo } from "@/components/care-sync/Logo";
 import { useTheme } from "@/components/care-sync/ThemeToggle";
-import { useCareSync } from "@/lib/store";
+import { useCareSync, getRoleHomePath } from "@/lib/store";
 import { Role } from "@/types/caresync";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -35,21 +39,86 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
+  const [isSignUpMode, setIsSignUpMode] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("ananya.sharma@caresync.health");
-  const [password, setPassword] = useState("••••••••••••");
+  const [password, setPassword] = useState("password123");
   const [rememberMe, setRememberMe] = useState(true);
-  const { setRole } = useCareSync();
+  const [loading, setLoading] = useState(false);
+
+  const { setRole, loginWithSupabase, signUpWithSupabase } = useCareSync();
   const { resolvedTheme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRole("doctor");
-    navigate({ to: "/doctor/dashboard" });
+
+    // Validation
+    const cleanEmail = email.trim();
+    if (!cleanEmail || !cleanEmail.includes("@") || !cleanEmail.includes(".")) {
+      toast.error("Please enter a valid email address (e.g. user@gmail.com)");
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
+    setLoading(true);
+
+    if (isSignUpMode) {
+      if (!fullName.trim()) {
+        toast.error("Please enter your full name for patient profile registration");
+        setLoading(false);
+        return;
+      }
+
+      const res = await signUpWithSupabase(cleanEmail, password, fullName.trim(), phone.trim());
+      setLoading(false);
+
+      if (res.success) {
+        toast.success("Account created successfully! Redirecting to Patient Portal...");
+        navigate({ to: "/patient/dashboard" });
+      } else {
+        const err = res.error || "";
+        if (err.includes("already registered") || err.includes("already exists")) {
+          toast.error("This email is already registered. Please sign in instead.");
+          setIsSignUpMode(false);
+        } else if (err.includes("weak_password") || err.includes("password")) {
+          toast.error("Weak password: Password must be at least 6 characters.");
+        } else if (err.includes("email_address_invalid")) {
+          toast.error("Invalid email address format.");
+        } else {
+          toast.error(err || "Sign up failed. Please check network connection.");
+        }
+      }
+    } else {
+      // Sign In Flow
+      const res = await loginWithSupabase(cleanEmail, password);
+      setLoading(false);
+
+      if (res.success) {
+        const targetRole = res.role || "doctor";
+        toast.success(`Welcome back! Logged in as ${targetRole.toUpperCase()}`);
+        navigate({ to: getRoleHomePath(targetRole) });
+      } else {
+        const err = res.error || "";
+        if (err.includes("Invalid login credentials") || err.includes("invalid_credentials")) {
+          toast.error("Invalid email or password. Please verify your credentials.");
+        } else if (err.includes("Email not confirmed")) {
+          toast.warning("Notice: Email confirmation required in Supabase project settings.");
+        } else {
+          toast.error(err || "Authentication failed. Please verify your network and credentials.");
+        }
+      }
+    }
   };
 
   const handleQuickDemoRole = (role: Role, targetPath: string) => {
     setRole(role);
+    toast.success(`Switched to ${role.toUpperCase()} Persona`);
     navigate({ to: targetPath });
   };
 
@@ -81,7 +150,7 @@ function LoginPage() {
           <Logo compact />
           <div className="mt-16 max-w-lg">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-calm ring-1 ring-white/15 backdrop-blur">
-              <span className="size-1.5 rounded-full bg-calm" /> First Commit Hackathon Prototype
+              <span className="size-1.5 rounded-full bg-calm" /> Connected Care Operations
             </span>
             <h1 className="mt-6 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
               One Continuous Digital Patient Journey.
@@ -100,7 +169,7 @@ function LoginPage() {
             <div className="flex items-center gap-2 text-calm font-mono text-xs uppercase tracking-wider">
               <Zap className="size-4" /> Judge & Evaluator Fast Track
             </div>
-            <span className="text-[11px] font-mono text-white/60">No password required</span>
+            <span className="text-[11px] font-mono text-white/60">Instant Role Switch</span>
           </div>
           <p className="mt-2 text-xs text-white/80">
             Select any persona below or on the right to jump directly into full cross-department
@@ -126,7 +195,7 @@ function LoginPage() {
 
         <div className="relative z-10 flex items-center justify-between text-xs text-white/60 font-mono">
           <span>CareSync Hospital Automation</span>
-          <span>Not a diagnostic tool</span>
+          <span>Supabase Auth Integrated</span>
         </div>
       </div>
 
@@ -137,25 +206,73 @@ function LoginPage() {
             <Logo />
           </div>
 
-          <div>
-            <h2 className="text-2xl font-bold text-ink">Sign In to CareSync</h2>
-            <p className="text-xs sm:text-sm text-ink/60 mt-1">
-              Enter your hospital credentials or pick a demo persona below.
-            </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-ink">
+                {isSignUpMode ? "Create Hospital Account" : "Sign In to CareSync"}
+              </h2>
+              <p className="text-xs sm:text-sm text-ink/60 mt-1">
+                {isSignUpMode
+                  ? "Register with Supabase Auth to track your patient health journey."
+                  : "Enter your hospital credentials or pick a demo persona below."}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsSignUpMode((prev) => !prev)}
+              className="text-xs border-border bg-card shrink-0"
+            >
+              {isSignUpMode ? "Sign In Instead" : "Sign Up"}
+            </Button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSignIn} className="space-y-4">
+          <form onSubmit={handleAuthSubmit} className="space-y-3.5">
+            {isSignUpMode && (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor="fullName" className="text-xs font-medium text-ink">
+                    Full Name
+                  </Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. Ramesh Kumar"
+                    className="bg-card border-border h-10 text-sm"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone" className="text-xs font-medium text-ink">
+                    Contact Phone Number (Optional)
+                  </Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91 98765 43210"
+                    className="bg-card border-border h-10 text-sm font-mono"
+                  />
+                </div>
+              </>
+            )}
+
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-xs font-medium text-ink">
-                Hospital Email
+                {isSignUpMode ? "Email Address" : "Hospital Email"}
               </Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="doctor@hospital.org"
+                placeholder="user@hospital.org"
                 className="bg-card border-border h-10 text-sm"
                 required
               />
@@ -166,45 +283,64 @@ function LoginPage() {
                 <Label htmlFor="password" className="text-xs font-medium text-ink">
                   Password
                 </Label>
-                <button
-                  type="button"
-                  onClick={() => alert("Demo Mode: Click any role below to sign in instantly.")}
-                  className="text-xs text-brand hover:underline"
-                >
-                  Forgot password?
-                </button>
+                {!isSignUpMode && (
+                  <button
+                    type="button"
+                    onClick={() => toast.info("Demo Mode: Click any persona below to sign in instantly.")}
+                    className="text-xs text-brand hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                )}
               </div>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
                 className="bg-card border-border h-10 text-sm"
                 required
               />
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="remember"
-                checked={rememberMe}
-                onCheckedChange={(checked) => setRememberMe(!!checked)}
-              />
-              <label htmlFor="remember" className="text-xs text-ink/70 cursor-pointer">
-                Remember my device for 30 days
-              </label>
-            </div>
+            {!isSignUpMode && (
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(!!checked)}
+                />
+                <label htmlFor="remember" className="text-xs text-ink/70 cursor-pointer">
+                  Remember my device for 30 days
+                </label>
+              </div>
+            )}
 
             <Button
               type="submit"
+              disabled={loading}
               className="w-full bg-brand hover:bg-brand/90 text-white font-medium h-10 shadow-sm"
             >
-              Sign In to Workspace <ArrowRight className="size-4 ml-1.5" />
+              {loading ? (
+                <>
+                  <Loader2 className="size-4 mr-2 animate-spin" />
+                  {isSignUpMode ? "Creating Account..." : "Signing In..."}
+                </>
+              ) : isSignUpMode ? (
+                <>
+                  <UserPlus className="size-4 mr-1.5" /> Complete Sign Up
+                </>
+              ) : (
+                <>
+                  Sign In to Workspace <ArrowRight className="size-4 ml-1.5" />
+                </>
+              )}
             </Button>
           </form>
 
           {/* Divider */}
-          <div className="relative my-6">
+          <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
             </div>

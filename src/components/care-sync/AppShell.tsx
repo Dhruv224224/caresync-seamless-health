@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   LayoutDashboard,
   Users,
@@ -24,6 +24,9 @@ import {
   ChevronRight,
   ShieldAlert,
   ArrowRight,
+  LogOut,
+  ShieldCheck,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +35,7 @@ import { NotificationCenter } from "@/components/care-sync/NotificationCenter";
 import { GlobalSearchDialog } from "@/components/care-sync/GlobalSearchDialog";
 import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton";
 import { useTheme } from "@/components/care-sync/ThemeToggle";
-import { useCareSync } from "@/lib/store";
+import { useCareSync, getRoleHomePath } from "@/lib/store";
 import { Role } from "@/types/caresync";
 
 interface AppShellProps {
@@ -45,11 +48,35 @@ interface AppShellProps {
 export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { currentRole, currentUser, setRole, prescriptions, testOrders, patients } = useCareSync();
+  const {
+    currentRole,
+    currentUser,
+    isAuthenticated,
+    authLoading,
+    setRole,
+    logout,
+    prescriptions,
+    testOrders,
+    patients,
+  } = useCareSync();
   const { resolvedTheme, toggleTheme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const role = activeRole || currentRole;
+
+  // Protected Route Check
+  const isProtectedRoleRoute =
+    location.pathname.startsWith("/doctor") ||
+    location.pathname.startsWith("/patient") ||
+    location.pathname.startsWith("/nurse") ||
+    location.pathname.startsWith("/lab") ||
+    location.pathname.startsWith("/pharmacy") ||
+    location.pathname.startsWith("/receptionist") ||
+    location.pathname.startsWith("/surgery");
+
+  // If activeRole is provided on this page, check authorization
+  const isRoleAuthorized = !activeRole || role === activeRole || activeRole === "doctor"; // Staff cross-overs allowed for emergency consultation
 
   const pendingLabCount = testOrders.filter(
     (t) => t.status === "Pending" || t.status === "In Progress",
@@ -171,6 +198,19 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
 
   const currentNavItems = getNavItemsForRole(role);
 
+  // If loading session state, render sleek skeleton
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-surf flex flex-col items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3 bg-card p-8 rounded-2xl border border-border shadow-lg max-w-sm text-center">
+          <Loader2 className="size-8 text-brand animate-spin" />
+          <div className="font-bold text-sm text-ink">Verifying Hospital Session</div>
+          <div className="text-xs text-ink/60 font-mono">Synchronizing profile & permissions...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-surf text-foreground flex flex-col justify-between selection:bg-brand/20">
       <div>
@@ -247,7 +287,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                 </Link>
               </Button>
 
-              {/* Active Role Persona Indicator */}
+              {/* Active Role Persona Indicator & Logout */}
               <div className="flex items-center gap-2 pl-2 border-l border-border/80">
                 <div className="size-7 rounded-md bg-brand/10 text-brand grid place-items-center font-bold text-xs border border-brand/20">
                   {currentUser.name.charAt(0)}
@@ -260,6 +300,18 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                     {role}
                   </div>
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={async () => {
+                    await logout();
+                    navigate({ to: "/login" });
+                  }}
+                  className="h-8 w-8 text-ink/60 hover:text-crit hover:bg-crit/10"
+                  title="Sign out / Switch user"
+                >
+                  <LogOut className="size-3.5" />
+                </Button>
               </div>
             </div>
           </div>
@@ -366,7 +418,27 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
           </aside>
 
           {/* Main Dynamic View Area */}
-          <main className="min-w-0 flex-1 p-3.5 sm:p-5 lg:p-6">{children}</main>
+          <main className="min-w-0 flex-1 p-3.5 sm:p-5 lg:p-6">
+            {!isRoleAuthorized ? (
+              <div className="p-8 text-center bg-card rounded-2xl border border-border shadow-xs space-y-3 max-w-lg mx-auto mt-10">
+                <ShieldAlert className="size-10 text-warn mx-auto" />
+                <div className="text-lg font-bold text-ink">Role Access Restriction</div>
+                <p className="text-xs text-ink/60 leading-relaxed">
+                  Your authenticated account role (<span className="font-mono font-bold text-brand uppercase">{role}</span>) does not have authorization to view this department workspace.
+                </p>
+                <div className="pt-2 flex justify-center gap-2">
+                  <Button
+                    onClick={() => navigate({ to: getRoleHomePath(role) })}
+                    className="bg-brand text-white text-xs"
+                  >
+                    Go to My Workspace ({role.toUpperCase()})
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              children
+            )}
+          </main>
         </div>
       </div>
 
@@ -375,14 +447,13 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
         <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-ink/75 text-[11px]">
-              CareSync Healthcare Operations Prototype
+              CareSync Healthcare Operations
             </span>
             <span className="text-ink/30">•</span>
-            <span className="text-[10px] font-mono text-calm">Connected Digital Thread</span>
+            <span className="text-[10px] font-mono text-calm">Supabase Auth Connected</span>
           </div>
           <span className="text-[10px] text-ink/45 max-w-xl text-center sm:text-right">
-            CareSync is a hackathon prototype for healthcare workflow demonstration. It is not
-            intended for clinical diagnosis, treatment decisions, or real patient data.
+            CareSync Connected Healthcare Digital Thread.
           </span>
         </div>
       </footer>

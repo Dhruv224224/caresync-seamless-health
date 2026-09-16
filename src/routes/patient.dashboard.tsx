@@ -36,8 +36,17 @@ export const Route = createFileRoute("/patient/dashboard")({
 });
 
 function PatientDashboardPage() {
-  const { patients, prescriptions, testOrders, timelines } = useCareSync();
-  const patient = patients.find((p) => p.id === "CS-001") ||
+  const { patients, currentUser, authUserId, prescriptions, testOrders, timelines } = useCareSync();
+
+  // Find patient record for logged-in patient or fallback to first available
+  const loggedInPatient =
+    patients.find(
+      (p) =>
+        (authUserId && p.id === authUserId) ||
+        (currentUser.id && p.id === currentUser.id) ||
+        (currentUser.name && p.name.toLowerCase() === currentUser.name.toLowerCase()),
+    ) ||
+    patients.find((p) => p.id === "CS-001") ||
     patients[0] || {
       id: "CS-001",
       name: "Rajesh Sharma",
@@ -55,6 +64,8 @@ function PatientDashboardPage() {
       roomNumber: "Ward 3B",
       registeredAt: "08:30 AM",
     };
+
+  const patient = loggedInPatient;
 
   const patientPrescriptions = prescriptions.filter((p) => p.patientId === patient.id);
   const patientTests = testOrders.filter((t) => t.patientId === patient.id);

@@ -56,14 +56,14 @@ function ReceptionistDashboardPage() {
   const [address, setAddress] = useState("");
   const [allergies, setAllergies] = useState("");
 
-  const handleRegisterPatient = (e: React.FormEvent) => {
+  const handleRegisterPatient = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !age) {
       toast.error("Please enter patient name and age");
       return;
     }
 
-    const created = addPatient({
+    const created = await addPatient({
       name: fullName,
       age: Number(age),
       gender,
@@ -81,7 +81,8 @@ function ReceptionistDashboardPage() {
     setFullName("");
     setAge("");
     setPhone("");
-    toast.success(`Patient ${created.name} (${created.id}) registered & added to Doctor's queue!`);
+    setAllergies("");
+    toast.success(`Patient ${created.name} (${created.id}) registered & stored in Supabase!`);
   };
 
   const filteredPatients = patients.filter(
