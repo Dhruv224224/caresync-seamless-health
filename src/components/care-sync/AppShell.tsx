@@ -63,20 +63,11 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
   const location = useLocation();
   const navigate = useNavigate();
 
+  // The active role is the explicit workspace role or currentRole
   const role = activeRole || currentRole;
 
-  // Protected Route Check
-  const isProtectedRoleRoute =
-    location.pathname.startsWith("/doctor") ||
-    location.pathname.startsWith("/patient") ||
-    location.pathname.startsWith("/nurse") ||
-    location.pathname.startsWith("/lab") ||
-    location.pathname.startsWith("/pharmacy") ||
-    location.pathname.startsWith("/receptionist") ||
-    location.pathname.startsWith("/surgery");
-
-  // If activeRole is provided on this page, check authorization
-  const isRoleAuthorized = !activeRole || role === activeRole || activeRole === "doctor"; // Staff cross-overs allowed for emergency consultation
+  // Authorization: if authenticated, verify the user has access to this workspace
+  const isRoleAuthorized = !isAuthenticated || !activeRole || currentRole === activeRole || (currentRole === "doctor" && activeRole !== "patient");
 
   const pendingLabCount = testOrders.filter(
     (t) => t.status === "Pending" || t.status === "In Progress",

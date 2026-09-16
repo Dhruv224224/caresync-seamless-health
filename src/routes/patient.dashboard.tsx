@@ -204,6 +204,18 @@ function PatientDashboardPage() {
               My Test Reports ({patientTests.length})
             </TabsTrigger>
             <TabsTrigger
+              value="documents"
+              className="text-xs data-[state=active]:bg-brand data-[state=active]:text-primary-foreground font-semibold"
+            >
+              Documents
+            </TabsTrigger>
+            <TabsTrigger
+              value="bills"
+              className="text-xs data-[state=active]:bg-brand data-[state=active]:text-primary-foreground font-semibold"
+            >
+              Bills & Insurance
+            </TabsTrigger>
+            <TabsTrigger
               value="profile"
               className="text-xs data-[state=active]:bg-brand data-[state=active]:text-primary-foreground font-semibold"
             >
@@ -379,7 +391,90 @@ function PatientDashboardPage() {
             ))}
           </TabsContent>
 
-          {/* TAB 4: Profile */}
+          {/* TAB 4: Documents */}
+          <TabsContent value="documents" className="space-y-3">
+            <Card className="border-border bg-card shadow-2xs">
+              <CardHeader className="p-3.5 border-b border-border/60">
+                <CardTitle className="text-xs font-bold text-ink uppercase tracking-wide">
+                  Medical Records & Discharge Summaries
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-2.5 text-xs">
+                {[
+                  { title: "OPD Initial Consultation Report", date: "Today", size: "245 KB" },
+                  { title: "Diagnostic Lab Sign-Off", date: "Today", size: "180 KB" },
+                  { title: "Admission & Consent Document", date: "Today", size: "320 KB" },
+                ].map((doc, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-3 rounded-xl border border-border bg-surf"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <FileText className="size-4 text-brand" />
+                      <div>
+                        <div className="font-semibold text-ink">{doc.title}</div>
+                        <div className="text-[10px] font-mono text-ink/50">{doc.date} · {doc.size}</div>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => toast.success(`Downloaded ${doc.title}`)}
+                      className="text-xs h-7 border-border bg-card"
+                    >
+                      <Download className="size-3 mr-1 text-brand" /> View
+                    </Button>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TAB 5: Bills & Insurance */}
+          <TabsContent value="bills" className="space-y-3">
+            <Card className="border-border bg-card shadow-2xs">
+              <CardHeader className="p-3.5 border-b border-border/60 flex flex-row items-center justify-between">
+                <CardTitle className="text-xs font-bold text-ink uppercase tracking-wide">
+                  Hospital Invoices & Pre-Authorization
+                </CardTitle>
+                <Badge className="bg-calm/15 text-calm text-[10px] font-mono border-calm/30">
+                  Pre-Auth Approved
+                </Badge>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3 text-xs">
+                <div className="grid grid-cols-2 gap-3 pb-3 border-b border-border">
+                  <div>
+                    <span className="text-ink/50 text-[11px] block">Total Estimated Bill</span>
+                    <span className="text-lg font-bold text-ink">₹ 14,250</span>
+                  </div>
+                  <div>
+                    <span className="text-ink/50 text-[11px] block">Insurance Covered</span>
+                    <span className="text-lg font-bold text-calm">₹ 14,250 (100%)</span>
+                  </div>
+                </div>
+                <div className="space-y-1.5 font-mono text-[11px]">
+                  <div className="flex justify-between py-1 border-b border-border/50">
+                    <span className="text-ink/70">OPD Consultation & Registration</span>
+                    <span className="text-ink">₹ 850</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-border/50">
+                    <span className="text-ink/70">Laboratory Diagnostics (CBC)</span>
+                    <span className="text-ink">₹ 650</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-border/50">
+                    <span className="text-ink/70">Pharmacy Medications</span>
+                    <span className="text-ink">₹ 1,250</span>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="text-ink/70">Ward & Pre-Op Care</span>
+                    <span className="text-ink">₹ 11,500</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* TAB 6: Profile */}
           <TabsContent value="profile" className="space-y-3">
             <Card className="border-border bg-card shadow-2xs">
               <CardHeader className="p-3.5 border-b border-border/60">
