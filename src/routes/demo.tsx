@@ -3,19 +3,23 @@ import {
   Activity,
   ArrowRight,
   CheckCircle2,
+  ClipboardList,
   Clock,
   ExternalLink,
   FlaskConical,
+  HeartPulse,
   LayoutDashboard,
   LucideIcon,
   Moon,
   Pill,
   RotateCcw,
+  ShieldAlert,
   Sparkles,
   Stethoscope,
   Sun,
   User,
   UserCheck,
+  Users,
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,6 +44,7 @@ export const Route = createFileRoute("/demo")({
 const rolesList: {
   role: Role;
   title: string;
+  buttonLabel: string;
   emoji: string;
   icon: LucideIcon;
   user: (typeof DEMO_USERS)[Role];
@@ -50,6 +55,7 @@ const rolesList: {
   {
     role: "patient",
     title: "Patient",
+    buttonLabel: "Open Patient Workspace",
     emoji: "👤",
     icon: Users,
     user: DEMO_USERS.patient,
@@ -59,8 +65,21 @@ const rolesList: {
     keyActions: ["View Timeline", "Download Prescriptions", "Inspect Lab Results"],
   },
   {
+    role: "receptionist",
+    title: "Receptionist",
+    buttonLabel: "Open Reception Workspace",
+    emoji: "🧾",
+    icon: ClipboardList,
+    user: DEMO_USERS.receptionist,
+    path: "/receptionist/dashboard",
+    description:
+      "Register incoming patients, create hospital UHIDs, schedule consultations, and assign beds.",
+    keyActions: ["Patient Registration", "Doctor Queue Check-In", "Bed Assignment"],
+  },
+  {
     role: "doctor",
     title: "Doctor",
+    buttonLabel: "Open Doctor Workspace",
     emoji: "👨‍⚕️",
     icon: Stethoscope,
     user: DEMO_USERS.doctor,
@@ -72,6 +91,7 @@ const rolesList: {
   {
     role: "nurse",
     title: "Nurse",
+    buttonLabel: "Open Nursing Workspace",
     emoji: "👩‍⚕️",
     icon: HeartPulse,
     user: DEMO_USERS.nurse,
@@ -83,6 +103,7 @@ const rolesList: {
   {
     role: "lab",
     title: "Laboratory",
+    buttonLabel: "Open Laboratory Workspace",
     emoji: "🧪",
     icon: FlaskConical,
     user: DEMO_USERS.lab,
@@ -94,6 +115,7 @@ const rolesList: {
   {
     role: "pharmacy",
     title: "Pharmacy",
+    buttonLabel: "Open Pharmacy Workspace",
     emoji: "💊",
     icon: Pill,
     user: DEMO_USERS.pharmacy,
@@ -101,17 +123,6 @@ const rolesList: {
     description:
       "Fulfill digital prescriptions in real time, dispense medications, and manage stock levels.",
     keyActions: ["Review Pending Rx", "1-Click Dispensing", "Inventory Status"],
-  },
-  {
-    role: "receptionist",
-    title: "Receptionist",
-    emoji: "🧾",
-    icon: ClipboardList,
-    user: DEMO_USERS.receptionist,
-    path: "/receptionist/dashboard",
-    description:
-      "Register incoming patients, create hospital UHIDs, schedule consultations, and assign beds.",
-    keyActions: ["Patient Registration", "Doctor Queue Check-In", "Bed Assignment"],
   },
 ];
 
@@ -231,7 +242,7 @@ function DemoRoleSelectionPage() {
                     onClick={() => handleSelectRole(item.role, item.path)}
                     className="w-full bg-brand/10 hover:bg-brand text-brand hover:text-white transition-all font-medium text-xs h-9 justify-between"
                   >
-                    <span>Launch {item.title} Workspace</span>
+                    <span>{item.buttonLabel}</span>
                     <ArrowRight className="size-4" />
                   </Button>
                 </div>

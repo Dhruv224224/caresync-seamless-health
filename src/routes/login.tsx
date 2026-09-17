@@ -286,7 +286,9 @@ function LoginPage() {
                 {!isSignUpMode && (
                   <button
                     type="button"
-                    onClick={() => toast.info("Demo Mode: Click any persona below to sign in instantly.")}
+                    onClick={() =>
+                      toast.info("Demo Mode: Click any persona below to sign in instantly.")
+                    }
                     className="text-xs text-brand hover:underline"
                   >
                     Forgot password?
@@ -345,13 +347,13 @@ function LoginPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase font-mono">
-              <span className="bg-surf px-3 text-ink/40">Or Enter Via Demo Mode</span>
+              <span className="bg-surf px-3 text-ink/65 font-medium">Or Enter Via Demo Mode</span>
             </div>
           </div>
 
           {/* 6 Demo Personas */}
           <div className="space-y-2">
-            <div className="text-[11px] font-mono text-ink/50 uppercase tracking-wider">
+            <div className="text-[11px] font-mono text-ink/70 font-semibold uppercase tracking-wider">
               Select Demo Role (Judge Sandbox)
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -405,16 +407,16 @@ function LoginPage() {
                     key={p.role}
                     type="button"
                     onClick={() => handleQuickDemoRole(p.role as Role, p.path)}
-                    className="flex items-center gap-2.5 p-2.5 rounded-xl border border-border bg-card hover:bg-brand/5 hover:border-brand/40 text-left transition-all group"
+                    className="flex items-center gap-2.5 p-2.5 rounded-xl border border-border bg-card hover:bg-brand/10 hover:border-brand/50 text-left transition-all group shadow-2xs cursor-pointer"
                   >
-                    <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-surf text-brand group-hover:bg-brand group-hover:text-white transition-colors">
+                    <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-surf text-brand group-hover:bg-brand group-hover:text-white transition-colors border border-border/70">
                       <Icon className="size-4" />
                     </div>
                     <div className="min-w-0 flex-1 leading-tight">
                       <div className="text-xs font-semibold text-ink group-hover:text-brand truncate">
                         {p.title}
                       </div>
-                      <div className="text-[10px] text-ink/50 truncate font-mono">{p.name}</div>
+                      <div className="text-[10px] text-ink/70 truncate font-mono font-medium">{p.name}</div>
                     </div>
                   </button>
                 );
@@ -423,7 +425,7 @@ function LoginPage() {
           </div>
 
           <div className="text-center pt-2">
-            <Link to="/" className="text-xs text-ink/50 hover:text-ink transition-colors">
+            <Link to="/" className="text-xs font-medium text-ink/70 hover:text-brand transition-colors">
               ← Return to Public Landing Page
             </Link>
           </div>

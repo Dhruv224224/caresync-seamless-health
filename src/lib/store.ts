@@ -104,29 +104,55 @@ function notify() {
 }
 
 // Convert Supabase patient row to frontend Patient type
-function mapDbPatientToPatient(row: Record<string, any>): Patient {
+function mapDbPatientToPatient(row: Record<string, unknown>): Patient {
+  const rowId = String(row["id"] || "");
+  const fullName = String(row["full_name"] || row["name"] || "Unknown Patient");
+  const age = Number(row["age"]) || 0;
+  const gender = (row["gender"] as "Male" | "Female" | "Other") || "Male";
+  const bloodGroup = String(row["blood_group"] || "O+");
+  const phone = String(row["phone"] || "");
+  const address = String(row["address"] || "");
+  const rawAllergies = row["allergies"];
+  const allergies: string[] = Array.isArray(rawAllergies)
+    ? (rawAllergies as string[])
+    : rawAllergies
+      ? [String(rawAllergies)]
+      : [];
+  const rawMedHistory = row["medical_history"];
+  const medicalHistory: string[] = Array.isArray(rawMedHistory)
+    ? (rawMedHistory as string[])
+    : rawMedHistory
+      ? [String(rawMedHistory)]
+      : [];
+  const status = (row["status"] as Patient["status"]) || "Waiting";
+  const currentDepartment = String(row["current_department"] || "Outpatient Clinic");
+  const assignedDoctor = String(row["assigned_doctor"] || "Dr. Ananya Sharma");
+  const bedNumber = row["bed_number"] ? String(row["bed_number"]) : undefined;
+  const roomNumber = row["room_number"] ? String(row["room_number"]) : undefined;
+  const createdAt = row["created_at"];
+  const registeredAt = createdAt
+    ? new Date(String(createdAt)).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "Just now";
+
   return {
-    id: row.id,
-    name: row.full_name || row.name || "Unknown Patient",
-    age: Number(row.age) || 0,
-    gender: (row.gender as "Male" | "Female" | "Other") || "Male",
-    bloodGroup: row.blood_group || "O+",
-    phone: row.phone || "",
-    address: row.address || "",
-    allergies: Array.isArray(row.allergies) ? row.allergies : row.allergies ? [row.allergies] : [],
-    medicalHistory: Array.isArray(row.medical_history)
-      ? row.medical_history
-      : row.medical_history
-        ? [row.medical_history]
-        : [],
-    status: (row.status as Patient["status"]) || "Waiting",
-    currentDepartment: row.current_department || "Outpatient Clinic",
-    assignedDoctor: row.assigned_doctor || "Dr. Ananya Sharma",
-    bedNumber: row.bed_number,
-    roomNumber: row.room_number,
-    registeredAt: row.created_at
-      ? new Date(row.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      : "Just now",
+    id: rowId,
+    name: fullName,
+    age,
+    gender,
+    bloodGroup,
+    phone,
+    address,
+    allergies,
+    medicalHistory,
+    status,
+    currentDepartment,
+    assignedDoctor,
+    ...(bedNumber ? { bedNumber } : {}),
+    ...(roomNumber ? { roomNumber } : {}),
+    registeredAt,
   };
 }
 
@@ -143,7 +169,7 @@ async function fetchSupabasePatients(): Promise<Patient[]> {
       return [];
     }
     if (data && data.length > 0) {
-      return data.map(mapDbPatientToPatient);
+      return (data as Record<string, unknown>[]).map(mapDbPatientToPatient);
     }
     return [];
   } catch (err) {
@@ -153,7 +179,11 @@ async function fetchSupabasePatients(): Promise<Patient[]> {
 }
 
 // Helper to load user profile from profiles table with fallback
-export async function fetchUserProfile(userId: string, userEmail?: string, metadata?: Record<string, any>): Promise<UserProfile> {
+export async function fetchUserProfile(
+  userId: string,
+  userEmail?: string,
+  metadata?: Record<string, unknown>,
+): Promise<UserProfile> {
   try {
     const { data, error } = await supabase
       .from("profiles")
@@ -166,19 +196,34 @@ export async function fetchUserProfile(userId: string, userEmail?: string, metad
     }
 
     if (data) {
-      const rawRole = (data.role || "").toLowerCase();
-      const validRole: Role = ["doctor", "receptionist", "nurse", "lab", "pharmacy", "patient"].includes(rawRole)
+      const dataRec = data as Record<string, unknown>;
+      const rawRole = String(dataRec["role"] || "").toLowerCase();
+      const validRole: Role = [
+        "doctor",
+        "receptionist",
+        "nurse",
+        "lab",
+        "pharmacy",
+        "patient",
+      ].includes(rawRole)
         ? (rawRole as Role)
         : "patient";
 
+      const title = dataRec["title"]
+        ? String(dataRec["title"])
+        : `${validRole.charAt(0).toUpperCase() + validRole.slice(1)} Workspace`;
+      const department = dataRec["department"] ? String(dataRec["department"]) : "Hospital Main Facility";
+      const avatarUrl = dataRec["avatar_url"] ? String(dataRec["avatar_url"]) : undefined;
+
       return {
-        id: data.id,
-        name: data.full_name || metadata?.full_name || userEmail?.split("@")[0] || "Authenticated User",
+        id: String(dataRec["id"] || userId),
+        name:
+          String(dataRec["full_name"] || metadata?.["full_name"] || userEmail?.split("@")[0] || "Authenticated User"),
         email: userEmail || "",
         role: validRole,
-        title: data.title || `${validRole.charAt(0).toUpperCase() + validRole.slice(1)} Workspace`,
-        department: data.department || "Hospital Main Facility",
-        avatar_url: data.avatar_url,
+        title,
+        department,
+        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
       };
     }
   } catch (e) {
@@ -186,10 +231,10 @@ export async function fetchUserProfile(userId: string, userEmail?: string, metad
   }
 
   // If profiles row not created yet (e.g. trigger delay or new auth user), default to patient role
-  const defaultRole: Role = (metadata?.role as Role) || "patient";
+  const defaultRole: Role = (metadata?.["role"] as Role) || "patient";
   return {
     id: userId,
-    name: metadata?.full_name || userEmail?.split("@")[0] || "User",
+    name: String(metadata?.["full_name"] || userEmail?.split("@")[0] || "User"),
     email: userEmail || "",
     role: defaultRole,
     title: `${defaultRole.charAt(0).toUpperCase() + defaultRole.slice(1)} Workspace`,
@@ -212,7 +257,7 @@ async function initializeSupabaseAuth() {
       const profile = await fetchUserProfile(
         session.user.id,
         session.user.email,
-        session.user.user_metadata
+        session.user.user_metadata,
       );
       globalState = {
         ...globalState,
@@ -250,7 +295,7 @@ async function initializeSupabaseAuth() {
         const profile = await fetchUserProfile(
           session.user.id,
           session.user.email,
-          session.user.user_metadata
+          session.user.user_metadata,
         );
         globalState = {
           ...globalState,
@@ -332,7 +377,11 @@ export const useCareSync = () => {
       if (data.user) {
         // If session was returned immediately (email confirmation disabled in Supabase)
         if (data.session) {
-          const profile = await fetchUserProfile(data.user.id, data.user.email, data.user.user_metadata);
+          const profile = await fetchUserProfile(
+            data.user.id,
+            data.user.email,
+            data.user.user_metadata,
+          );
           globalState = {
             ...globalState,
             isAuthenticated: true,
@@ -347,8 +396,9 @@ export const useCareSync = () => {
         return { success: true, role: "patient" };
       }
       return { success: true, role: "patient" };
-    } catch (err: any) {
-      return { success: false, error: err.message || "Sign up failed" };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Sign up failed";
+      return { success: false, error: msg };
     }
   };
 
@@ -367,7 +417,11 @@ export const useCareSync = () => {
       }
 
       if (data.user) {
-        const profile = await fetchUserProfile(data.user.id, data.user.email, data.user.user_metadata);
+        const profile = await fetchUserProfile(
+          data.user.id,
+          data.user.email,
+          data.user.user_metadata,
+        );
         globalState = {
           ...globalState,
           isAuthenticated: true,
@@ -380,8 +434,9 @@ export const useCareSync = () => {
         return { success: true, role: profile.role };
       }
       return { success: true, role: "doctor" };
-    } catch (err: any) {
-      return { success: false, error: err.message || "Failed to sign in" };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to sign in";
+      return { success: false, error: msg };
     }
   };
 
@@ -414,7 +469,9 @@ export const useCareSync = () => {
     }
   };
 
-  const addPatient = async (patientData: Omit<Patient, "id" | "registeredAt">): Promise<Patient> => {
+  const addPatient = async (
+    patientData: Omit<Patient, "id" | "registeredAt">,
+  ): Promise<Patient> => {
     const nextNum = globalState.patients.length + 1;
     const fallbackId = `CS-${String(nextNum).padStart(3, "0")}`;
 
@@ -464,10 +521,7 @@ export const useCareSync = () => {
         status: patientData.status,
       };
 
-      const { data, error } = await supabase
-        .from("patients")
-        .insert([dbPayload])
-        .select();
+      const { data, error } = await supabase.from("patients").insert([dbPayload]).select();
 
       if (error) {
         console.warn("[CareSync Store] Supabase patient insert notice:", error.message);
@@ -475,7 +529,7 @@ export const useCareSync = () => {
         const createdRow = data[0];
         const assignedId = createdRow.id || fallbackId;
         const mapped = mapDbPatientToPatient(createdRow);
-        
+
         globalState = {
           ...globalState,
           patients: globalState.patients.map((p) => (p.id === fallbackId ? mapped : p)),
@@ -513,14 +567,17 @@ export const useCareSync = () => {
     };
     notify();
 
-    supabase
-      .from("patients")
-      .update({ status })
-      .eq("id", patientId)
-      .then(({ error }) => {
+    void (async () => {
+      try {
+        const { error } = await supabase
+          .from("patients")
+          .update({ status })
+          .eq("id", patientId);
         if (error) console.warn("[CareSync Store] Supabase status update notice:", error.message);
-      })
-      .catch((e) => console.warn(e));
+      } catch (e) {
+        console.warn(e);
+      }
+    })();
   };
 
   const addVital = (vital: Omit<VitalSign, "id" | "recordedAt" | "recordedBy">) => {

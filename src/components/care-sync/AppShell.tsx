@@ -67,7 +67,11 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
   const role = activeRole || currentRole;
 
   // Authorization: if authenticated, verify the user has access to this workspace
-  const isRoleAuthorized = !isAuthenticated || !activeRole || currentRole === activeRole || (currentRole === "doctor" && activeRole !== "patient");
+  const isRoleAuthorized =
+    !isAuthenticated ||
+    !activeRole ||
+    currentRole === activeRole ||
+    (currentRole === "doctor" && activeRole !== "patient");
 
   const pendingLabCount = testOrders.filter(
     (t) => t.status === "Pending" || t.status === "In Progress",
@@ -80,22 +84,24 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
     switch (r) {
       case "patient":
         return [
-          { label: "My Health Home", path: "/patient/dashboard", icon: LayoutDashboard },
-          { label: "Appointments", path: "/patient/dashboard", icon: Calendar, badge: "Upcoming" },
+          { label: "My Health Home", path: "/patient/dashboard", search: { tab: "timeline" }, icon: LayoutDashboard },
+          { label: "Appointments", path: "/patient/dashboard", search: { tab: "appointments" }, icon: Calendar, badge: "Upcoming" },
           {
             label: "Prescriptions",
             path: "/patient/dashboard",
+            search: { tab: "prescriptions" },
             icon: Pill,
             badge: `${prescriptions.filter((p) => p.patientId === "CS-001").length}`,
           },
           {
             label: "Lab Reports",
             path: "/patient/dashboard",
+            search: { tab: "reports" },
             icon: FlaskConical,
             badge: `${testOrders.filter((t) => t.patientId === "CS-001").length}`,
           },
-          { label: "Billing & Insurance", path: "/patient/dashboard", icon: CreditCard },
-          { label: "Care Timeline", path: "/patient/dashboard", icon: Activity },
+          { label: "Billing & Insurance", path: "/patient/dashboard", search: { tab: "bills" }, icon: CreditCard },
+          { label: "Care Timeline", path: "/patient/dashboard", search: { tab: "timeline" }, icon: Activity },
         ];
       case "doctor":
         return [
@@ -196,7 +202,9 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
         <div className="flex flex-col items-center gap-3 bg-card p-8 rounded-2xl border border-border shadow-lg max-w-sm text-center">
           <Loader2 className="size-8 text-brand animate-spin" />
           <div className="font-bold text-sm text-ink">Verifying Hospital Session</div>
-          <div className="text-xs text-ink/60 font-mono">Synchronizing profile & permissions...</div>
+          <div className="text-xs text-ink/60 font-mono">
+            Synchronizing profile & permissions...
+          </div>
         </div>
       </div>
     );
@@ -335,39 +343,41 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               <nav className="space-y-1">
                 {currentNavItems.map((item) => {
                   const Icon = item.icon;
+                  const currentSearchTab = new URLSearchParams(location.search).get("tab");
                   const isActive =
                     item.path === "/doctor/patient/$id"
                       ? location.pathname.startsWith("/doctor/patient")
-                      : location.pathname === item.path;
+                      : item.search?.tab
+                        ? location.pathname === item.path && (currentSearchTab === item.search.tab || (!currentSearchTab && item.search.tab === "timeline" && item.label === "My Health Home"))
+                        : location.pathname === item.path;
 
                   return (
                     <Link
                       key={item.label}
                       to={item.path}
-                      params={item.params}
-                      activeProps={{
-                        className:
-                          "bg-brand-500/10 text-brand-700 dark:text-brand-300 font-semibold shadow-xs",
-                      }}
-                      inactiveProps={{
-                        className:
-                          "text-surf-600 dark:text-surf-400 hover:text-surf-950 dark:hover:text-surf-100 hover:bg-surf-100 dark:hover:bg-surf-800/60",
-                      }}
+                      {...(item.params ? { params: item.params } : {})}
+                      {...(item.search ? { search: item.search } : {})}
                       onClick={() => setSidebarOpen(false)}
-                      className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors"
+                      className={`flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                        isActive
+                          ? "bg-brand/10 text-brand font-semibold shadow-xs border border-brand/20"
+                          : "text-ink/70 hover:text-ink hover:bg-surf font-medium"
+                      }`}
                     >
                       <div className="flex items-center gap-2.5 truncate">
                         <Icon
-                          className={`size-4 shrink-0 ${isActive ? "text-primary-foreground" : "text-brand"}`}
+                          className={`size-4 shrink-0 ${
+                            isActive ? "text-brand" : "text-ink/60"
+                          }`}
                         />
                         <span className="truncate">{item.label}</span>
                       </div>
                       {item.badge && (
                         <span
-                          className={`rounded px-1.5 py-0.5 font-mono text-[9px] shrink-0 ${
+                          className={`rounded px-1.5 py-0.5 font-mono text-[9px] shrink-0 font-medium ${
                             isActive
-                              ? "bg-white/20 text-white"
-                              : "bg-brand/10 text-brand font-medium"
+                              ? "bg-brand text-white shadow-2xs"
+                              : "bg-brand/10 text-brand"
                           }`}
                         >
                           {item.badge}
@@ -415,7 +425,9 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                 <ShieldAlert className="size-10 text-warn mx-auto" />
                 <div className="text-lg font-bold text-ink">Role Access Restriction</div>
                 <p className="text-xs text-ink/60 leading-relaxed">
-                  Your authenticated account role (<span className="font-mono font-bold text-brand uppercase">{role}</span>) does not have authorization to view this department workspace.
+                  Your authenticated account role (
+                  <span className="font-mono font-bold text-brand uppercase">{role}</span>) does not
+                  have authorization to view this department workspace.
                 </p>
                 <div className="pt-2 flex justify-center gap-2">
                   <Button

@@ -268,10 +268,24 @@ function LandingPage() {
               >
                 How It Works
               </a>
+              <a
+                href="#safety"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 rounded-md hover:bg-surf"
+              >
+                Safety & Standards
+              </a>
+              <Link
+                to="/demo"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 rounded-md hover:bg-surf text-brand font-semibold"
+              >
+                Explore Demo →
+              </Link>
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-surf text-brand font-semibold"
+                className="p-2 rounded-md hover:bg-surf text-ink font-semibold"
               >
                 Sign In to Portal →
               </Link>

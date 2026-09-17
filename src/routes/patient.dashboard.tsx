@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Users,
   Calendar,
@@ -28,7 +28,16 @@ import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton"
 import { useCareSync } from "@/lib/store";
 import { toast } from "sonner";
 
+interface PatientSearch {
+  tab?: string;
+}
+
 export const Route = createFileRoute("/patient/dashboard")({
+  validateSearch: (search: Record<string, unknown>): PatientSearch => {
+    return {
+      tab: typeof search.tab === "string" ? search.tab : undefined,
+    };
+  },
   head: () => ({
     meta: [{ title: "My Health Home — Rajesh Sharma | CareSync" }],
   }),
@@ -36,16 +45,25 @@ export const Route = createFileRoute("/patient/dashboard")({
 });
 
 function PatientDashboardPage() {
+  const search = Route.useSearch();
+  const activeTabFromSearch = search.tab || "timeline";
+  const [activeTab, setActiveTab] = useState(activeTabFromSearch);
+
+  // Sync state if search param changes
+  useEffect(() => {
+    if (search.tab) {
+      setActiveTab(search.tab);
+    }
+  }, [search.tab]);
   const { patients, currentUser, authUserId, prescriptions, testOrders, timelines } = useCareSync();
 
   // Find patient record for logged-in patient or fallback to first available
-  const loggedInPatient =
-    patients.find(
-      (p) =>
-        (authUserId && p.id === authUserId) ||
-        (currentUser.id && p.id === currentUser.id) ||
-        (currentUser.name && p.name.toLowerCase() === currentUser.name.toLowerCase()),
-    ) ||
+  const loggedInPatient = patients.find(
+    (p) =>
+      (authUserId && p.id === authUserId) ||
+      (currentUser.id && p.id === currentUser.id) ||
+      (currentUser.name && p.name.toLowerCase() === currentUser.name.toLowerCase()),
+  ) ||
     patients.find((p) => p.id === "CS-001") ||
     patients[0] || {
       id: "CS-001",
@@ -183,13 +201,19 @@ function PatientDashboardPage() {
         </div>
 
         {/* Patient Tabs */}
-        <Tabs defaultValue="timeline" className="space-y-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="bg-card border border-border p-1 rounded-lg h-auto flex flex-wrap gap-1">
             <TabsTrigger
               value="timeline"
               className="text-xs data-[state=active]:bg-brand data-[state=active]:text-primary-foreground font-semibold"
             >
               My Care Timeline
+            </TabsTrigger>
+            <TabsTrigger
+              value="appointments"
+              className="text-xs data-[state=active]:bg-brand data-[state=active]:text-primary-foreground font-semibold"
+            >
+              Appointments (Upcoming)
             </TabsTrigger>
             <TabsTrigger
               value="prescriptions"
@@ -222,6 +246,62 @@ function PatientDashboardPage() {
               Patient Profile
             </TabsTrigger>
           </TabsList>
+
+          {/* TAB: Appointments */}
+          <TabsContent value="appointments" className="space-y-3">
+            <Card className="border-border bg-card shadow-2xs">
+              <CardHeader className="p-4 border-b border-border/60 flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-sm font-bold text-ink uppercase tracking-wide">
+                    Scheduled Doctor Appointments
+                  </CardTitle>
+                  <p className="text-xs text-ink/50">
+                    Your confirmed consultations and hospital check-in windows
+                  </p>
+                </div>
+                <Badge className="bg-calm/15 text-calm text-[10px] font-mono border-calm/30">
+                  <span className="size-1.5 rounded-full bg-calm mr-1 animate-pulse" /> 1 Upcoming
+                </Badge>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-border bg-surf gap-3">
+                  <div className="flex items-start gap-3.5">
+                    <div className="size-10 rounded-xl bg-brand/10 text-brand grid place-items-center shrink-0 border border-brand/20">
+                      <Calendar className="size-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm text-ink">General Medicine Follow-up</span>
+                        <Badge className="bg-brand/15 text-brand border-brand/30 text-[10px] font-mono">
+                          Confirmed
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-ink/70 mt-1">
+                        Attending: <strong>Dr. Ananya Sharma</strong> · OPD Suite 4
+                      </div>
+                      <div className="text-[11px] font-mono text-ink/50 mt-0.5">
+                        Scheduled: Tomorrow, 10:30 AM · Room 204 Main Facility
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 sm:self-center">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => toast.info("Reminder set for your appointment tomorrow at 10:30 AM")}
+                      className="text-xs h-8 border-border bg-card text-ink"
+                    >
+                      Set Reminder
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-border/60 bg-surf/40 text-xs text-ink/60">
+                  <strong className="text-ink font-semibold">Need to reschedule?</strong> Contact hospital reception at <span className="font-mono text-brand">+91 98765 00000</span> or reach out via front desk triage.
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* TAB 1: My Timeline */}
           <TabsContent value="timeline" className="space-y-4">
@@ -413,7 +493,9 @@ function PatientDashboardPage() {
                       <FileText className="size-4 text-brand" />
                       <div>
                         <div className="font-semibold text-ink">{doc.title}</div>
-                        <div className="text-[10px] font-mono text-ink/50">{doc.date} · {doc.size}</div>
+                        <div className="text-[10px] font-mono text-ink/50">
+                          {doc.date} · {doc.size}
+                        </div>
                       </div>
                     </div>
                     <Button
