@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   UserRound,
   Calendar,
@@ -18,6 +18,7 @@ import {
   Plus,
   ShieldCheck,
   Sparkles,
+  Loader2,
 } from "lucide-react";
 import { AppShell } from "@/components/care-sync/AppShell";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton";
 import { useCareSync } from "@/lib/store";
+import {
+  fetchPatientByIdFromDb,
+  fetchTimelineByPatientFromDb,
+  fetchPrescriptionsByPatientFromDb,
+  fetchTestOrdersByPatientFromDb,
+  fetchVisitsByPatientFromDb,
+} from "@/lib/dbServices";
+import { Patient, TimelineEvent, Prescription, TestOrder, DbVisit } from "@/types/caresync";
 
 export const Route = createFileRoute("/doctor/patient/$id")({
   head: () => ({
@@ -38,30 +47,97 @@ function PatientProfilePage() {
   const { id } = useParams({ from: "/doctor/patient/$id" });
   const { patients, vitals, prescriptions, testOrders, surgeries, timelines } = useCareSync();
 
-  const patient = patients.find((p) => p.id === id) ||
-    patients[0] || {
-      id: "CS-001",
-      name: "Rajesh Sharma",
-      age: 54,
-      gender: "Male" as const,
-      bloodGroup: "B+",
-      phone: "+91 98765 43210",
-      address: "42 Lotus Enclave, Indiranagar, Bengaluru",
-      allergies: ["Penicillin", "Sulfa Drugs"],
-      medicalHistory: ["Hypertension (5 yrs)", "Type 2 Diabetes", "Appendicitis"],
-      status: "In Consultation" as const,
-      currentDepartment: "General Medicine",
+  const [dbPatient, setDbPatient] = useState<Patient | null>(null);
+  const [dbTimeline, setDbTimeline] = useState<TimelineEvent[]>([]);
+  const [dbPrescriptions, setDbPrescriptions] = useState<Prescription[]>([]);
+  const [dbTestOrders, setDbTestOrders] = useState<TestOrder[]>([]);
+  const [dbVisits, setDbVisits] = useState<DbVisit[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch live record from Supabase by route param ID
+  useEffect(() => {
+    let mounted = true;
+    async function loadPatientData() {
+      if (!id) return;
+      setLoading(true);
+      try {
+        const [patientData, timelineData, rxData, testData, visitData] = await Promise.allSettled([
+          fetchPatientByIdFromDb(id),
+          fetchTimelineByPatientFromDb(id),
+          fetchPrescriptionsByPatientFromDb(id),
+          fetchTestOrdersByPatientFromDb(id),
+          fetchVisitsByPatientFromDb(id),
+        ]);
+
+        if (mounted) {
+          if (patientData.status === "fulfilled" && patientData.value) {
+            setDbPatient(patientData.value);
+          }
+          if (timelineData.status === "fulfilled" && timelineData.value) {
+            setDbTimeline(timelineData.value);
+          }
+          if (rxData.status === "fulfilled" && rxData.value) {
+            setDbPrescriptions(rxData.value);
+          }
+          if (testData.status === "fulfilled" && testData.value) {
+            setDbTestOrders(testData.value);
+          }
+          if (visitData.status === "fulfilled" && visitData.value) {
+            setDbVisits(visitData.value);
+          }
+        }
+      } catch (err) {
+        console.warn("[PatientProfile] Database fetch notice:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    loadPatientData();
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
+  // Resolve active patient: 1. Live DB record -> 2. Local store matching ID -> 3. Fallback
+  const storePatient = patients.find((p) => p.id === id);
+  const fallbackFirst = patients.length > 0 && id === "CS-001" ? patients[0] : undefined;
+  const patient: Patient =
+    dbPatient ||
+    storePatient ||
+    fallbackFirst || {
+      id: id || "CS-001",
+      name: "Patient Record",
+      age: 45,
+      gender: "Male",
+      bloodGroup: "O+",
+      phone: "+91 98765 00000",
+      address: "Bengaluru, Karnataka",
+      allergies: [],
+      medicalHistory: [],
+      status: "Waiting",
+      currentDepartment: "Outpatient Clinic",
       assignedDoctor: "Dr. Ananya Sharma",
-      bedNumber: "Bed 12",
-      roomNumber: "Ward 3B",
-      registeredAt: "2026-09-15 08:30 AM",
+      registeredAt: "Just now",
     };
 
   const patientVitals = vitals.filter((v) => v.patientId === patient.id);
-  const patientPrescriptions = prescriptions.filter((p) => p.patientId === patient.id);
-  const patientLabOrders = testOrders.filter((t) => t.patientId === patient.id);
+  const patientPrescriptions =
+    dbPrescriptions.length > 0
+      ? dbPrescriptions
+      : prescriptions.filter((p) => p.patientId === patient.id);
+
+  const patientLabOrders =
+    dbTestOrders.length > 0
+      ? dbTestOrders
+      : testOrders.filter((t) => t.patientId === patient.id);
+
   const patientSurgery = surgeries.find((s) => s.patientId === patient.id);
-  const patientTimeline = timelines[patient.id] || timelines["CS-001"] || [];
+
+  const patientTimeline =
+    dbTimeline.length > 0
+      ? dbTimeline
+      : timelines[patient.id] || timelines["CS-001"] || [];
 
   return (
     <AppShell>

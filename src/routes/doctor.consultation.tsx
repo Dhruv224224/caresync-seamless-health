@@ -31,7 +31,16 @@ import { useCareSync } from "@/lib/store";
 import { PrescriptionItem } from "@/types/caresync";
 import { toast } from "sonner";
 
+interface ConsultationSearch {
+  patientId?: string | undefined;
+}
+
 export const Route = createFileRoute("/doctor/consultation")({
+  validateSearch: (search: Record<string, unknown>): ConsultationSearch => {
+    return {
+      patientId: typeof search["patientId"] === "string" ? (search["patientId"] as string) : undefined,
+    };
+  },
   head: () => ({
     meta: [{ title: "Digital Consultation & Prescription Builder | CareSync" }],
   }),
@@ -39,10 +48,18 @@ export const Route = createFileRoute("/doctor/consultation")({
 });
 
 function DoctorConsultationPage() {
-  const { patients, addPrescription, addTestOrder, updatePatientStatus } = useCareSync();
+  const search = Route.useSearch();
+  const { patients, currentUser, addVisit, addPrescription, addTestOrder, updatePatientStatus } = useCareSync();
   const navigate = useNavigate();
 
-  const [selectedPatientId, setSelectedPatientId] = useState("CS-001");
+  const [selectedPatientId, setSelectedPatientId] = useState<string>(
+    search.patientId || (patients[0]?.id ?? "CS-001"),
+  );
+
+  const [savingConsultation, setSavingConsultation] = useState(false);
+  const [orderingLab, setOrderingLab] = useState(false);
+  const [savingRx, setSavingRx] = useState(false);
+
   const [symptoms, setSymptoms] = useState(
     "Persistent right lower abdominal pain (3 days), low grade fever, nausea.",
   );
@@ -125,41 +142,88 @@ function DoctorConsultationPage() {
     setMedicines(medicines.map((m) => (m.id === id ? { ...m, [field]: val } : m)));
   };
 
-  const handleCreatePrescription = () => {
-    if (medicines.length === 0) {
-      toast.error("Add at least one medicine");
+  const handleCreatePrescription = async () => {
+    const validItems = medicines.filter((m) => m.medicine.trim().length > 0);
+    if (validItems.length === 0) {
+      toast.error("Add at least one medicine with a valid name");
       return;
     }
 
-    addPrescription({
-      patientId: selectedPatient.id,
-      patientName: selectedPatient.name,
-      doctorId: "DOC-01",
-      doctorName: "Dr. Ananya Sharma",
-      items: medicines,
-      notes: clinicalNotes,
-    });
+    setSavingRx(true);
+    try {
+      const rx = await addPrescription({
+        patientId: selectedPatient.id,
+        patientName: selectedPatient.name,
+        doctorId: currentUser.id || "DOC-01",
+        doctorName: currentUser.name || "Dr. Ananya Sharma",
+        items: validItems,
+        notes: clinicalNotes,
+      });
 
-    toast.success(`Digital Prescription generated & dispatched to Pharmacy!`);
+      toast.success(`Prescription ${rx.id} created & persisted to Supabase!`);
+    } catch (e: any) {
+      toast.error(`Prescription error: ${e.message}`);
+    } finally {
+      setSavingRx(false);
+    }
   };
 
-  const handleOrderLabTest = () => {
-    addTestOrder({
-      patientId: selectedPatient.id,
-      patientName: selectedPatient.name,
-      doctorName: "Dr. Ananya Sharma",
-      testName: selectedLabTest,
-      priority: labPriority,
-    });
+  const handleOrderLabTest = async () => {
+    setOrderingLab(true);
+    try {
+      const order = await addTestOrder({
+        patientId: selectedPatient.id,
+        patientName: selectedPatient.name,
+        doctorName: currentUser.name || "Dr. Ananya Sharma",
+        testName: selectedLabTest,
+        priority: labPriority,
+      });
 
-    toast.success(`Lab Test "${selectedLabTest}" ordered & sent to Diagnostics!`);
+      toast.success(`Test order ${order.id} (${selectedLabTest}) created in Supabase!`);
+    } catch (e: any) {
+      toast.error(`Test order error: ${e.message}`);
+    } finally {
+      setOrderingLab(false);
+    }
   };
 
-  const handleCompleteConsultation = () => {
-    handleCreatePrescription();
-    updatePatientStatus(selectedPatient.id, "Diagnostics", "Central Laboratory");
-    toast.success(`Consultation recorded. Patient ${selectedPatient.id} moved to Diagnostics.`);
-    navigate({ to: "/doctor/patient/$id", params: { id: selectedPatient.id } });
+  const handleCompleteConsultation = async () => {
+    setSavingConsultation(true);
+    try {
+      // 1. Record clinical visit
+      await addVisit({
+        patient_id: selectedPatient.id,
+        doctor_id: currentUser.id || "DOC-01",
+        doctor_name: currentUser.name || "Dr. Ananya Sharma",
+        chief_complaint: symptoms,
+        clinical_notes: clinicalNotes,
+        diagnosis: diagnosis,
+        treatment_plan: treatmentPlan,
+      });
+
+      // 2. Create prescription if medicines exist
+      const validItems = medicines.filter((m) => m.medicine.trim().length > 0);
+      if (validItems.length > 0) {
+        await addPrescription({
+          patientId: selectedPatient.id,
+          patientName: selectedPatient.name,
+          doctorId: currentUser.id || "DOC-01",
+          doctorName: currentUser.name || "Dr. Ananya Sharma",
+          items: validItems,
+          notes: clinicalNotes,
+        });
+      }
+
+      // 3. Update patient status to In Consultation / Diagnostics
+      updatePatientStatus(selectedPatient.id, "In Consultation", "OPD Room 4");
+
+      toast.success(`Consultation saved in Supabase for ${selectedPatient.name}!`);
+      navigate({ to: "/doctor/patient/$id", params: { id: selectedPatient.id } });
+    } catch (e: any) {
+      toast.error(`Error finalizing consultation: ${e.message}`);
+    } finally {
+      setSavingConsultation(false);
+    }
   };
 
   return (
@@ -461,9 +525,10 @@ function DoctorConsultationPage() {
                 <div className="pt-2 flex flex-col sm:flex-row gap-2">
                   <Button
                     onClick={handleCreatePrescription}
+                    disabled={savingRx}
                     className="flex-1 bg-calm hover:bg-calm/90 text-white text-xs h-9"
                   >
-                    <Pill className="size-3.5 mr-1" /> Forward Rx to Pharmacy
+                    <Pill className="size-3.5 mr-1" /> {savingRx ? "Creating prescription..." : "Forward Rx to Pharmacy"}
                   </Button>
                   <Button
                     variant="outline"

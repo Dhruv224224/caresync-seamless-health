@@ -47,6 +47,8 @@ function ReceptionistDashboardPage() {
   const [registerOpen, setRegisterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [submitting, setSubmitting] = useState(false);
+
   // Registration Form State
   const [fullName, setFullName] = useState("");
   const [age, setAge] = useState("");
@@ -55,34 +57,48 @@ function ReceptionistDashboardPage() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [allergies, setAllergies] = useState("");
+  const [medicalHistory, setMedicalHistory] = useState("");
+  const [emergencyContact, setEmergencyContact] = useState("");
 
   const handleRegisterPatient = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !age) {
+    if (!fullName.trim() || !age) {
       toast.error("Please enter patient name and age");
       return;
     }
 
-    const created = await addPatient({
-      name: fullName,
-      age: Number(age),
-      gender,
-      bloodGroup,
-      phone: phone || "+91 98765 00000",
-      address: address || "Bengaluru, Karnataka",
-      allergies: allergies ? allergies.split(",").map((s) => s.trim()) : [],
-      medicalHistory: ["New Patient Check-in"],
-      status: "Waiting",
-      currentDepartment: "Outpatient Clinic",
-      assignedDoctor: "Dr. Ananya Sharma",
-    });
+    setSubmitting(true);
+    try {
+      const created = await addPatient({
+        name: fullName.trim(),
+        age: Number(age),
+        gender,
+        bloodGroup,
+        phone: phone.trim() || "+91 98765 00000",
+        address: address.trim() || "Indiranagar, Bengaluru, Karnataka",
+        allergies: allergies ? allergies.split(",").map((s) => s.trim()).filter(Boolean) : [],
+        medicalHistory: medicalHistory
+          ? medicalHistory.split(",").map((s) => s.trim()).filter(Boolean)
+          : ["General Checkup & Triage"],
+        status: "Waiting",
+        currentDepartment: "Outpatient Clinic",
+        assignedDoctor: "Dr. Ananya Sharma",
+      });
 
-    setRegisterOpen(false);
-    setFullName("");
-    setAge("");
-    setPhone("");
-    setAllergies("");
-    toast.success(`Patient ${created.name} (${created.id}) registered & stored in Supabase!`);
+      setRegisterOpen(false);
+      setFullName("");
+      setAge("");
+      setPhone("");
+      setAddress("");
+      setAllergies("");
+      setMedicalHistory("");
+      setEmergencyContact("");
+      toast.success(`Patient created: ${created.name} (UHID: ${created.id}) in Supabase database!`);
+    } catch (err: any) {
+      toast.error(`Registration error: ${err.message || "Failed to save patient"}`);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const filteredPatients = patients.filter(
@@ -131,11 +147,11 @@ function ReceptionistDashboardPage() {
 
               <form onSubmit={handleRegisterPatient} className="space-y-3.5 py-2.5">
                 <div className="space-y-1">
-                  <Label className="text-xs font-medium text-ink">Full Name</Label>
+                  <Label className="text-xs font-medium text-ink">Full Name *</Label>
                   <Input
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Ramesh Kumar"
+                    placeholder="e.g. Rajesh Sharma"
                     className="text-xs bg-surf h-8"
                     required
                   />
@@ -143,12 +159,12 @@ function ReceptionistDashboardPage() {
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1">
-                    <Label className="text-xs font-medium text-ink">Age</Label>
+                    <Label className="text-xs font-medium text-ink">Age *</Label>
                     <Input
                       type="number"
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
-                      placeholder="45"
+                      placeholder="54"
                       className="text-xs bg-surf h-8 font-mono"
                       required
                     />
@@ -188,24 +204,56 @@ function ReceptionistDashboardPage() {
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <Label className="text-xs font-medium text-ink">Phone Number</Label>
-                  <Input
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98765 43210"
-                    className="text-xs bg-surf h-8 font-mono"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-ink">Phone Number</Label>
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91 98765 43210"
+                      className="text-xs bg-surf h-8 font-mono"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-ink">Emergency Contact</Label>
+                    <Input
+                      value={emergencyContact}
+                      onChange={(e) => setEmergencyContact(e.target.value)}
+                      placeholder="Sunita Sharma (+91 98765 00000)"
+                      className="text-xs bg-surf h-8"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs font-medium text-ink">Known Allergies</Label>
+                  <Label className="text-xs font-medium text-ink">Residential Address</Label>
                   <Input
-                    value={allergies}
-                    onChange={(e) => setAllergies(e.target.value)}
-                    placeholder="e.g. Penicillin, Peanuts"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="42 Lotus Enclave, Indiranagar, Bengaluru"
                     className="text-xs bg-surf h-8"
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-ink">Known Allergies (comma separated)</Label>
+                    <Input
+                      value={allergies}
+                      onChange={(e) => setAllergies(e.target.value)}
+                      placeholder="e.g. Penicillin, Sulfa Drugs"
+                      className="text-xs bg-surf h-8"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-medium text-ink">Medical History (comma separated)</Label>
+                    <Input
+                      value={medicalHistory}
+                      onChange={(e) => setMedicalHistory(e.target.value)}
+                      placeholder="e.g. Hypertension, Diabetes"
+                      className="text-xs bg-surf h-8"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-end gap-2 pt-2.5 border-t border-border">
@@ -215,6 +263,7 @@ function ReceptionistDashboardPage() {
                     size="sm"
                     onClick={() => setRegisterOpen(false)}
                     className="text-xs"
+                    disabled={submitting}
                   >
                     Cancel
                   </Button>
@@ -222,8 +271,9 @@ function ReceptionistDashboardPage() {
                     type="submit"
                     size="sm"
                     className="bg-brand hover:bg-brand/90 text-primary-foreground text-xs"
+                    disabled={submitting}
                   >
-                    Complete Registration
+                    {submitting ? "Saving patient..." : "Complete Registration"}
                   </Button>
                 </div>
               </form>

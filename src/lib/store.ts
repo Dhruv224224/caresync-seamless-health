@@ -4,12 +4,14 @@ import {
   UserProfile,
   VitalSign,
   Prescription,
+  PrescriptionItem,
   TestOrder,
   MedicineInventory,
   SurgeryRecord,
   TimelineEvent,
   HospitalNotification,
   Role,
+  DbVisit,
 } from "@/types/caresync";
 import {
   DEMO_USERS,
@@ -472,9 +474,78 @@ export const useCareSync = () => {
   const addPatient = async (
     patientData: Omit<Patient, "id" | "registeredAt">,
   ): Promise<Patient> => {
+    // 1. Attempt database insert first so real generated patient_code / ID is returned
+    try {
+      const dbPayload = {
+        name: patientData.name,
+        age: patientData.age,
+        gender: patientData.gender,
+        blood_group: patientData.bloodGroup,
+        phone: patientData.phone,
+        address: patientData.address,
+        allergies: patientData.allergies,
+        medical_history: patientData.medicalHistory,
+        status: patientData.status || "Waiting",
+        current_department: patientData.currentDepartment || "Outpatient Clinic",
+        assigned_doctor: patientData.assignedDoctor || "Dr. Ananya Sharma",
+      };
+
+      const { data, error } = await supabase
+        .from("patients")
+        .insert([dbPayload])
+        .select();
+
+      if (error) {
+        console.warn("[CareSync Store] Supabase patient insert notice:", error.message);
+      } else if (data && data[0]) {
+        const createdRow = data[0];
+        const createdPatient = mapDbPatientToPatient(createdRow);
+
+        const initialTimeline: TimelineEvent = {
+          id: `EV-${Date.now()}`,
+          patientId: createdPatient.id,
+          title: "Patient Registered",
+          department: "Reception",
+          description: `Patient checked in by ${globalState.currentUser.name}. UHID ${createdPatient.id} issued.`,
+          timestamp: "Just now",
+          actor: globalState.currentUser.name,
+          status: "completed",
+          iconType: "registration",
+        };
+
+        // Persist timeline event to Supabase
+        try {
+          await supabase.from("patient_timeline").insert([{
+            patient_id: createdPatient.id,
+            title: initialTimeline.title,
+            department: initialTimeline.department,
+            description: initialTimeline.description,
+            actor: initialTimeline.actor,
+            status: initialTimeline.status,
+            icon_type: initialTimeline.iconType,
+          }]);
+        } catch (e) {
+          console.warn("[CareSync Store] Timeline insert notice:", e);
+        }
+
+        globalState = {
+          ...globalState,
+          patients: [createdPatient, ...globalState.patients.filter((p) => p.id !== createdPatient.id)],
+          timelines: {
+            ...globalState.timelines,
+            [createdPatient.id]: [initialTimeline],
+          },
+        };
+        notify();
+        return createdPatient;
+      }
+    } catch (err) {
+      console.error("[CareSync Store] Failed to save patient to Supabase:", err);
+    }
+
+    // Fallback if offline or demo mode
     const nextNum = globalState.patients.length + 1;
     const fallbackId = `CS-${String(nextNum).padStart(3, "0")}`;
-
     const newPatient: Patient = {
       ...patientData,
       id: fallbackId,
@@ -496,7 +567,6 @@ export const useCareSync = () => {
       iconType: "registration",
     };
 
-    // 1. Optimistically update local store
     globalState = {
       ...globalState,
       patients: [newPatient, ...globalState.patients],
@@ -506,45 +576,6 @@ export const useCareSync = () => {
       },
     };
     notify();
-
-    // 2. Persist to Supabase `patients` table
-    try {
-      const dbPayload = {
-        full_name: patientData.name,
-        age: patientData.age,
-        gender: patientData.gender,
-        blood_group: patientData.bloodGroup,
-        phone: patientData.phone,
-        address: patientData.address,
-        allergies: patientData.allergies,
-        medical_history: patientData.medicalHistory,
-        status: patientData.status,
-      };
-
-      const { data, error } = await supabase.from("patients").insert([dbPayload]).select();
-
-      if (error) {
-        console.warn("[CareSync Store] Supabase patient insert notice:", error.message);
-      } else if (data && data[0]) {
-        const createdRow = data[0];
-        const assignedId = createdRow.id || fallbackId;
-        const mapped = mapDbPatientToPatient(createdRow);
-
-        globalState = {
-          ...globalState,
-          patients: globalState.patients.map((p) => (p.id === fallbackId ? mapped : p)),
-          timelines: {
-            ...globalState.timelines,
-            [assignedId]: [initialTimeline],
-          },
-        };
-        notify();
-        return mapped;
-      }
-    } catch (err) {
-      console.error("[CareSync Store] Failed to save patient to Supabase:", err);
-    }
-
     return newPatient;
   };
 
@@ -569,9 +600,11 @@ export const useCareSync = () => {
 
     void (async () => {
       try {
+        const updateObj: Record<string, unknown> = { status };
+        if (department) updateObj["current_department"] = department;
         const { error } = await supabase
           .from("patients")
-          .update({ status })
+          .update(updateObj)
           .eq("id", patientId);
         if (error) console.warn("[CareSync Store] Supabase status update notice:", error.message);
       } catch (e) {
@@ -613,87 +646,274 @@ export const useCareSync = () => {
     notify();
   };
 
-  const addPrescription = (prescription: Omit<Prescription, "id" | "createdAt" | "status">) => {
-    const id = `RX-${Math.floor(100 + Math.random() * 900)}`;
-    const newPrescription: Prescription = {
-      ...prescription,
-      id,
-      status: "Pending",
-      createdAt: "Just now",
+  const addVisit = async (
+    visit: Omit<DbVisit, "id" | "created_at" | "visit_date"> & { visit_date?: string },
+  ): Promise<DbVisit> => {
+    let createdVisit: DbVisit | null = null;
+    try {
+      const { data, error } = await supabase
+        .from("visits")
+        .insert([
+          {
+            patient_id: visit.patient_id || (visit as any).patientId,
+            doctor_id: visit.doctor_id || (visit as any).doctorId,
+            doctor_name: visit.doctor_name || (visit as any).doctorName,
+            visit_date: visit.visit_date || new Date().toISOString(),
+            chief_complaint: visit.chief_complaint || (visit as any).chiefComplaint || "",
+            clinical_notes: visit.clinical_notes || (visit as any).clinicalNotes || "",
+            diagnosis: visit.diagnosis || "",
+            treatment_plan: visit.treatment_plan || (visit as any).treatmentPlan || "",
+          },
+        ])
+        .select()
+        .single();
+
+      if (!error && data) {
+        createdVisit = data as DbVisit;
+      } else if (error) {
+        console.warn("[CareSync Store] Supabase visit insert notice:", error.message);
+      }
+    } catch (e) {
+      console.warn("[CareSync Store] Visit insert error:", e);
+    }
+
+    const patientId = visit.patient_id || (visit as any).patientId;
+    const doctorName = visit.doctor_name || (visit as any).doctorName || globalState.currentUser.name;
+    const diagnosis = visit.diagnosis || "Clinical Review";
+
+    const fallbackVisit: DbVisit = createdVisit || {
+      id: `VISIT-${Date.now()}`,
+      patient_id: patientId,
+      doctor_id: visit.doctor_id || (visit as any).doctorId || globalState.currentUser.id,
+      doctor_name: doctorName,
+      visit_date: new Date().toISOString(),
+      chief_complaint: visit.chief_complaint || (visit as any).chiefComplaint || "",
+      clinical_notes: visit.clinical_notes || (visit as any).clinicalNotes || "",
+      diagnosis: diagnosis,
+      treatment_plan: visit.treatment_plan || (visit as any).treatmentPlan || "",
     };
 
     const timelineEntry: TimelineEvent = {
       id: `EV-${Date.now()}`,
-      patientId: prescription.patientId,
-      title: `Digital Prescription Created (${id})`,
-      department: "OPD / Doctor",
-      description: `${prescription.items.length} medicines prescribed. Order dispatched to Pharmacy.`,
+      patientId: patientId,
+      title: `Consultation Completed: ${diagnosis}`,
+      department: "Doctor OPD",
+      description: `Seen by ${doctorName}. Diagnosis: ${diagnosis}.`,
       timestamp: "Just now",
-      actor: prescription.doctorName,
+      actor: doctorName,
+      status: "completed",
+      iconType: "consultation",
+    };
+
+    try {
+      await supabase.from("patient_timeline").insert([
+        {
+          patient_id: patientId,
+          title: timelineEntry.title,
+          department: timelineEntry.department,
+          description: timelineEntry.description,
+          actor: timelineEntry.actor,
+          status: timelineEntry.status,
+          icon_type: timelineEntry.iconType,
+        },
+      ]);
+    } catch (e) {
+      console.warn("[CareSync Store] Timeline insert notice:", e);
+    }
+
+    const existingTimeline = globalState.timelines[patientId] || [];
+    globalState = {
+      ...globalState,
+      timelines: {
+        ...globalState.timelines,
+        [patientId]: [timelineEntry, ...existingTimeline],
+      },
+    };
+    notify();
+
+    return fallbackVisit;
+  };
+
+  const addPrescription = async (
+    prescriptionData: {
+      patientId: string;
+      patientName: string;
+      doctorId: string;
+      doctorName: string;
+      items: { medicine: string; dosage: string; frequency: string; duration: string; instructions: string }[];
+      notes?: string;
+    },
+  ): Promise<Prescription> => {
+    let createdPrescription: Prescription | null = null;
+    try {
+      const rxPayload = {
+        patient_id: prescriptionData.patientId,
+        patient_name: prescriptionData.patientName,
+        doctor_id: prescriptionData.doctorId,
+        doctor_name: prescriptionData.doctorName,
+        status: "Pending",
+        notes: prescriptionData.notes || "",
+      };
+
+      const { data: rxData, error: rxError } = await supabase
+        .from("prescriptions")
+        .insert([rxPayload])
+        .select()
+        .single();
+
+      if (!rxError && rxData) {
+        const itemsPayload = prescriptionData.items.map((it) => ({
+          prescription_id: rxData.id,
+          medicine_name: it.medicine,
+          dosage: it.dosage,
+          frequency: it.frequency,
+          duration: it.duration,
+          instructions: it.instructions,
+        }));
+
+        const { data: itemsData } = await supabase
+          .from("prescription_items")
+          .insert(itemsPayload)
+          .select();
+
+        const mappedItems: PrescriptionItem[] = (itemsData || prescriptionData.items).map((i: any, idx: number) => ({
+          id: String(i.id || `ITEM-${idx}`),
+          medicine: String(i.medicine_name || i.medicine),
+          dosage: String(i.dosage),
+          frequency: String(i.frequency),
+          duration: String(i.duration),
+          instructions: String(i.instructions),
+        }));
+
+        createdPrescription = {
+          id: String(rxData.id),
+          patientId: prescriptionData.patientId,
+          patientName: prescriptionData.patientName,
+          doctorId: prescriptionData.doctorId,
+          doctorName: prescriptionData.doctorName,
+          status: "Pending",
+          createdAt: "Just now",
+          items: mappedItems,
+          notes: prescriptionData.notes,
+        };
+      }
+    } catch (e) {
+      console.warn("[CareSync Store] Prescription insert error:", e);
+    }
+
+    const fallbackPrescription: Prescription = createdPrescription || {
+      id: `RX-${Date.now()}`,
+      patientId: prescriptionData.patientId,
+      patientName: prescriptionData.patientName,
+      doctorId: prescriptionData.doctorId,
+      doctorName: prescriptionData.doctorName,
+      status: "Pending",
+      createdAt: "Just now",
+      items: prescriptionData.items.map((it, idx) => ({ ...it, id: `ITEM-${Date.now()}-${idx}` })),
+      notes: prescriptionData.notes,
+    };
+
+    const timelineEntry: TimelineEvent = {
+      id: `EV-${Date.now()}`,
+      patientId: prescriptionData.patientId,
+      title: "Prescription Issued",
+      department: "Doctor OPD",
+      description: `${prescriptionData.items.length} medication(s) prescribed by ${prescriptionData.doctorName}. Routed to Dispensary.`,
+      timestamp: "Just now",
+      actor: prescriptionData.doctorName,
       status: "completed",
       iconType: "pharmacy",
     };
 
     const notif: HospitalNotification = {
       id: `NOTIF-${Date.now()}`,
-      title: "New Prescription Queued",
-      message: `Prescription ${id} for ${prescription.patientName} received for dispensing.`,
+      title: "New Prescription Received",
+      message: `${prescriptionData.patientName}: ${prescriptionData.items.length} item(s) pending dispensing.`,
       targetRole: "pharmacy",
-      patientId: prescription.patientId,
+      patientId: prescriptionData.patientId,
       timestamp: "Just now",
       read: false,
       type: "prescription",
     };
 
-    const existingTimeline = globalState.timelines[prescription.patientId] || [];
+    try {
+      await supabase.from("patient_timeline").insert([
+        {
+          patient_id: prescriptionData.patientId,
+          title: timelineEntry.title,
+          department: timelineEntry.department,
+          description: timelineEntry.description,
+          actor: timelineEntry.actor,
+          status: timelineEntry.status,
+          icon_type: timelineEntry.iconType,
+        },
+      ]);
+    } catch (e) {
+      console.warn("[CareSync Store] Timeline insert notice:", e);
+    }
 
+    const existingTimeline = globalState.timelines[prescriptionData.patientId] || [];
     globalState = {
       ...globalState,
-      prescriptions: [newPrescription, ...globalState.prescriptions],
+      prescriptions: [fallbackPrescription, ...globalState.prescriptions],
       notifications: [notif, ...globalState.notifications],
       timelines: {
         ...globalState.timelines,
-        [prescription.patientId]: [timelineEntry, ...existingTimeline],
+        [prescriptionData.patientId]: [timelineEntry, ...existingTimeline],
       },
     };
     notify();
+
+    return fallbackPrescription;
   };
 
-  const dispensePrescription = (prescriptionId: string) => {
+  const dispensePrescription = async (prescriptionId: string) => {
     const rx = globalState.prescriptions.find((p) => p.id === prescriptionId);
     if (!rx) return;
+
+    try {
+      await supabase
+        .from("prescriptions")
+        .update({ status: "Dispensed", dispensed_at: new Date().toISOString() })
+        .eq("id", prescriptionId);
+    } catch (e) {
+      console.warn("[CareSync Store] Prescription dispense update notice:", e);
+    }
 
     const timelineEntry: TimelineEvent = {
       id: `EV-${Date.now()}`,
       patientId: rx.patientId,
-      title: `Medicines Dispensed (${rx.id})`,
+      title: "Medications Dispensed",
       department: "Pharmacy",
-      description: "Prescribed medication dispensed and counseling provided to patient.",
+      description: `All items verified and handed over by ${globalState.currentUser.name}.`,
       timestamp: "Just now",
       actor: globalState.currentUser.name,
       status: "completed",
       iconType: "pharmacy",
     };
 
-    const notif: HospitalNotification = {
-      id: `NOTIF-${Date.now()}`,
-      title: "Medication Dispensed",
-      message: `Prescription ${rx.id} for ${rx.patientName} has been dispensed.`,
-      targetRole: "doctor",
-      patientId: rx.patientId,
-      timestamp: "Just now",
-      read: false,
-      type: "prescription",
-    };
+    try {
+      await supabase.from("patient_timeline").insert([
+        {
+          patient_id: rx.patientId,
+          title: timelineEntry.title,
+          department: timelineEntry.department,
+          description: timelineEntry.description,
+          actor: timelineEntry.actor,
+          status: timelineEntry.status,
+          icon_type: timelineEntry.iconType,
+        },
+      ]);
+    } catch (e) {
+      console.warn("[CareSync Store] Timeline insert notice:", e);
+    }
 
     const existingTimeline = globalState.timelines[rx.patientId] || [];
-
     globalState = {
       ...globalState,
       prescriptions: globalState.prescriptions.map((p) =>
         p.id === prescriptionId ? { ...p, status: "Dispensed", dispensedAt: "Just now" } : p,
       ),
-      notifications: [notif, ...globalState.notifications],
       timelines: {
         ...globalState.timelines,
         [rx.patientId]: [timelineEntry, ...existingTimeline],
@@ -702,68 +922,150 @@ export const useCareSync = () => {
     notify();
   };
 
-  const addTestOrder = (order: Omit<TestOrder, "id" | "orderedAt" | "status">) => {
-    const id = `LAB-${Math.floor(800 + Math.random() * 200)}`;
-    const newOrder: TestOrder = {
-      ...order,
-      id,
+  const addTestOrder = async (
+    orderData: {
+      patientId: string;
+      patientName: string;
+      doctorName: string;
+      testName: string;
+      priority: "Routine" | "Urgent" | "Stat";
+    },
+  ): Promise<TestOrder> => {
+    let createdOrder: TestOrder | null = null;
+    try {
+      const dbPayload = {
+        patient_id: orderData.patientId,
+        patient_name: orderData.patientName,
+        doctor_name: orderData.doctorName,
+        test_name: orderData.testName,
+        priority: orderData.priority,
+        status: "Pending",
+      };
+
+      const { data, error } = await supabase
+        .from("test_orders")
+        .insert([dbPayload])
+        .select()
+        .single();
+
+      if (!error && data) {
+        createdOrder = {
+          id: String(data.id),
+          patientId: String(data.patient_id),
+          patientName: String(data.patient_name),
+          doctorName: String(data.doctor_name),
+          testName: String(data.test_name),
+          priority: data.priority as "Routine" | "Urgent" | "Stat",
+          status: data.status as "Pending" | "In Progress" | "Completed",
+          orderedAt: "Just now",
+        };
+      }
+    } catch (e) {
+      console.warn("[CareSync Store] Test order insert notice:", e);
+    }
+
+    const fallbackOrder: TestOrder = createdOrder || {
+      id: `ORD-${Date.now()}`,
+      patientId: orderData.patientId,
+      patientName: orderData.patientName,
+      doctorName: orderData.doctorName,
+      testName: orderData.testName,
+      priority: orderData.priority,
       status: "Pending",
       orderedAt: "Just now",
     };
 
     const timelineEntry: TimelineEvent = {
       id: `EV-${Date.now()}`,
-      patientId: order.patientId,
-      title: `Diagnostic Test Ordered: ${order.testName}`,
-      department: "Laboratory",
-      description: `Requisition ${id} routed to central diagnostic lab.`,
+      patientId: orderData.patientId,
+      title: `Diagnostic Ordered: ${orderData.testName}`,
+      department: "Doctor OPD",
+      description: `${orderData.priority} priority requisition placed by ${orderData.doctorName}. Routed to Central Lab.`,
       timestamp: "Just now",
-      actor: order.doctorName,
+      actor: orderData.doctorName,
       status: "completed",
       iconType: "lab",
     };
 
     const notif: HospitalNotification = {
       id: `NOTIF-${Date.now()}`,
-      title: "New Diagnostic Request",
-      message: `${order.testName} requested for ${order.patientName} by ${order.doctorName}.`,
+      title: `New Lab Requisition (${orderData.priority})`,
+      message: `${orderData.patientName}: ${orderData.testName} ordered.`,
       targetRole: "lab",
-      patientId: order.patientId,
+      patientId: orderData.patientId,
       timestamp: "Just now",
       read: false,
       type: "order",
     };
 
-    const existingTimeline = globalState.timelines[order.patientId] || [];
+    try {
+      await supabase.from("patient_timeline").insert([
+        {
+          patient_id: orderData.patientId,
+          title: timelineEntry.title,
+          department: timelineEntry.department,
+          description: timelineEntry.description,
+          actor: timelineEntry.actor,
+          status: timelineEntry.status,
+          icon_type: timelineEntry.iconType,
+        },
+      ]);
+    } catch (e) {
+      console.warn("[CareSync Store] Timeline insert notice:", e);
+    }
 
+    const existingTimeline = globalState.timelines[orderData.patientId] || [];
     globalState = {
       ...globalState,
-      testOrders: [newOrder, ...globalState.testOrders],
+      testOrders: [fallbackOrder, ...globalState.testOrders],
       notifications: [notif, ...globalState.notifications],
       timelines: {
         ...globalState.timelines,
-        [order.patientId]: [timelineEntry, ...existingTimeline],
+        [orderData.patientId]: [timelineEntry, ...existingTimeline],
       },
     };
     notify();
+
+    return fallbackOrder;
   };
 
-  const updateTestOrderStatus = (
+  const updateTestOrderStatus = async (
     orderId: string,
     status: TestOrder["status"],
     results?: TestOrder["results"],
     labNotes?: string,
   ) => {
-    const order = globalState.testOrders.find((o) => o.id === orderId);
-    if (!order) return;
+    try {
+      const updatePayload: Record<string, unknown> = {
+        status,
+        ...(status === "Completed" ? { completed_at: new Date().toISOString() } : {}),
+        ...(labNotes !== undefined ? { lab_notes: labNotes } : {}),
+      };
 
-    let updatedTimeline = globalState.timelines[order.patientId] || [];
+      const { error } = await supabase
+        .from("test_orders")
+        .update(updatePayload)
+        .eq("id", orderId);
+
+      if (error) {
+        console.warn("[CareSync Store] Supabase test_orders status update notice:", error.message);
+      }
+    } catch (e) {
+      console.warn("[CareSync Store] test_orders update error:", e);
+    }
+
+    const order = globalState.testOrders.find((o) => o.id === orderId);
+    const patientId = order?.patientId || "CS-001";
+    const patientName = order?.patientName || "Patient";
+    const testName = order?.testName || "Diagnostic Test";
+
+    let updatedTimeline = globalState.timelines[patientId] || [];
 
     if (status === "Completed") {
       const timelineEntry: TimelineEvent = {
         id: `EV-${Date.now()}`,
-        patientId: order.patientId,
-        title: `Test Completed: ${order.testName}`,
+        patientId,
+        title: `Test Completed: ${testName}`,
         department: "Laboratory",
         description: `Results validated and signed off by ${globalState.currentUser.name}.`,
         timestamp: "Just now",
@@ -773,12 +1075,28 @@ export const useCareSync = () => {
       };
       updatedTimeline = [timelineEntry, ...updatedTimeline];
 
+      try {
+        await supabase.from("patient_timeline").insert([
+          {
+            patient_id: patientId,
+            title: timelineEntry.title,
+            department: timelineEntry.department,
+            description: timelineEntry.description,
+            actor: timelineEntry.actor,
+            status: timelineEntry.status,
+            icon_type: timelineEntry.iconType,
+          },
+        ]);
+      } catch (e) {
+        console.warn("[CareSync Store] Timeline insert notice:", e);
+      }
+
       const notif: HospitalNotification = {
         id: `NOTIF-${Date.now()}`,
-        title: `Test Result Available: ${order.testName}`,
-        message: `Verified report for ${order.patientName} is ready for review.`,
+        title: `Test Result Available: ${testName}`,
+        message: `Verified report for ${patientName} is ready for review.`,
         targetRole: "doctor",
-        patientId: order.patientId,
+        patientId,
         timestamp: "Just now",
         read: false,
         type: "result",
@@ -801,7 +1119,7 @@ export const useCareSync = () => {
       }),
       timelines: {
         ...globalState.timelines,
-        [order.patientId]: updatedTimeline,
+        [patientId]: updatedTimeline,
       },
     };
     notify();
@@ -888,6 +1206,7 @@ export const useCareSync = () => {
     addPatient,
     updatePatientStatus,
     addVital,
+    addVisit,
     addPrescription,
     dispensePrescription,
     addTestOrder,
@@ -897,3 +1216,4 @@ export const useCareSync = () => {
     resetToDefault,
   };
 };
+

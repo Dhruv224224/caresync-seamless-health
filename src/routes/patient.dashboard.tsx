@@ -28,18 +28,25 @@ import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton"
 import { useCareSync } from "@/lib/store";
 import { toast } from "sonner";
 
+import {
+  fetchTimelineByPatientFromDb,
+  fetchPrescriptionsByPatientFromDb,
+  fetchTestOrdersByPatientFromDb,
+} from "@/lib/dbServices";
+import { TimelineEvent, Prescription, TestOrder } from "@/types/caresync";
+
 interface PatientSearch {
-  tab?: string;
+  tab?: string | undefined;
 }
 
 export const Route = createFileRoute("/patient/dashboard")({
   validateSearch: (search: Record<string, unknown>): PatientSearch => {
     return {
-      tab: typeof search.tab === "string" ? search.tab : undefined,
+      tab: typeof search["tab"] === "string" ? (search["tab"] as string) : undefined,
     };
   },
   head: () => ({
-    meta: [{ title: "My Health Home — Rajesh Sharma | CareSync" }],
+    meta: [{ title: "My Health Home — CareSync" }],
   }),
   component: PatientDashboardPage,
 });
@@ -55,6 +62,7 @@ function PatientDashboardPage() {
       setActiveTab(search.tab);
     }
   }, [search.tab]);
+
   const { patients, currentUser, authUserId, prescriptions, testOrders, timelines } = useCareSync();
 
   // Find patient record for logged-in patient or fallback to first available
@@ -85,9 +93,49 @@ function PatientDashboardPage() {
 
   const patient = loggedInPatient;
 
-  const patientPrescriptions = prescriptions.filter((p) => p.patientId === patient.id);
-  const patientTests = testOrders.filter((t) => t.patientId === patient.id);
-  const patientTimeline = timelines[patient.id] || timelines["CS-001"] || [];
+  const [dbTimeline, setDbTimeline] = useState<TimelineEvent[]>([]);
+  const [dbPrescriptions, setDbPrescriptions] = useState<Prescription[]>([]);
+  const [dbTestOrders, setDbTestOrders] = useState<TestOrder[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    async function fetchLivePatientDetails() {
+      if (!patient.id) return;
+      try {
+        const [tl, rx, to] = await Promise.allSettled([
+          fetchTimelineByPatientFromDb(patient.id),
+          fetchPrescriptionsByPatientFromDb(patient.id),
+          fetchTestOrdersByPatientFromDb(patient.id),
+        ]);
+        if (active) {
+          if (tl.status === "fulfilled" && tl.value.length > 0) setDbTimeline(tl.value);
+          if (rx.status === "fulfilled" && rx.value.length > 0) setDbPrescriptions(rx.value);
+          if (to.status === "fulfilled" && to.value.length > 0) setDbTestOrders(to.value);
+        }
+      } catch (err) {
+        console.warn("[PatientDashboard] Live fetch notice:", err);
+      }
+    }
+    fetchLivePatientDetails();
+    return () => {
+      active = false;
+    };
+  }, [patient.id]);
+
+  const patientPrescriptions =
+    dbPrescriptions.length > 0
+      ? dbPrescriptions
+      : prescriptions.filter((p) => p.patientId === patient.id);
+
+  const patientTests =
+    dbTestOrders.length > 0
+      ? dbTestOrders
+      : testOrders.filter((t) => t.patientId === patient.id);
+
+  const patientTimeline =
+    dbTimeline.length > 0
+      ? dbTimeline
+      : timelines[patient.id] || timelines["CS-001"] || [];
 
   return (
     <AppShell activeRole="patient">

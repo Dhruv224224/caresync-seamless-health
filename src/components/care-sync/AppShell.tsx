@@ -79,8 +79,17 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
   const pendingRxCount = prescriptions.filter((p) => p.status === "Pending").length;
   const waitingPatientsCount = patients.filter((p) => p.status === "Waiting").length;
 
+  interface NavItem {
+    label: string;
+    path: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badge?: string | undefined;
+    params?: Record<string, string>;
+    search?: Record<string, string>;
+  }
+
   // Role-Specific Navigation Definitions
-  const getNavItemsForRole = (r: Role) => {
+  const getNavItemsForRole = (r: Role): NavItem[] => {
     switch (r) {
       case "patient":
         return [
@@ -343,12 +352,14 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               <nav className="space-y-1">
                 {currentNavItems.map((item) => {
                   const Icon = item.icon;
-                  const currentSearchTab = new URLSearchParams(location.search).get("tab");
+                  const searchObj = (location.search || {}) as Record<string, string | undefined>;
+                  const currentSearchTab = searchObj["tab"];
+                  const itemTab = item.search ? item.search["tab"] : undefined;
                   const isActive =
                     item.path === "/doctor/patient/$id"
                       ? location.pathname.startsWith("/doctor/patient")
-                      : item.search?.tab
-                        ? location.pathname === item.path && (currentSearchTab === item.search.tab || (!currentSearchTab && item.search.tab === "timeline" && item.label === "My Health Home"))
+                      : itemTab
+                        ? location.pathname === item.path && (currentSearchTab === itemTab || (!currentSearchTab && itemTab === "timeline" && item.label === "My Health Home"))
                         : location.pathname === item.path;
 
                   return (
