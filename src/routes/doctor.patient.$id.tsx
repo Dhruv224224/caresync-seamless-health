@@ -25,7 +25,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton";
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
+import {
+  exportPatientSummaryPdf,
+  exportPrescriptionPdf,
+  exportLabReportPdf,
+} from "@/lib/pdfGenerator";
 import { useCareSync } from "@/lib/store";
 import {
   fetchPatientByIdFromDb,
@@ -157,11 +162,38 @@ function PatientProfilePage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <AIPlaceholderButton
+            <AIActionButton
               label="Explain in Simple Language"
               featureName="Patient Clinical Explanation Assistant"
+              actionType="explain_simple"
+              role="doctor"
+              patientId={patient.id}
+              getContextData={() => ({
+                patient,
+                vitals: patientVitals,
+                prescriptions: patientPrescriptions,
+                tests: patientLabOrders,
+                timeline: patientTimeline,
+              })}
               className="text-xs h-8"
             />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                exportPatientSummaryPdf({
+                  patient,
+                  vitals: patientVitals,
+                  prescriptions: patientPrescriptions,
+                  tests: patientLabOrders,
+                  timeline: patientTimeline,
+                });
+                toast.success(`Patient Chart for ${patient.name} (${patient.id}) downloaded as PDF`);
+              }}
+              className="border-border text-xs h-8 bg-card text-ink hover:bg-surf cursor-pointer"
+            >
+              <FileText className="size-3.5 mr-1 text-brand" /> Download Chart PDF
+            </Button>
             <Button asChild size="sm" className="bg-brand hover:bg-brand/90 text-white text-xs h-8">
               <Link to="/doctor/consultation">
                 <Stethoscope className="size-3.5 mr-1" /> New Consultation Note
@@ -436,21 +468,51 @@ function PatientProfilePage() {
                   <CardHeader className="p-4 border-b border-border/60 flex flex-row items-center justify-between">
                     <div>
                       <CardTitle className="text-sm font-bold text-ink">
-                        Prescription {rx.id}
+                        Prescription #{rx.id}
                       </CardTitle>
                       <span className="text-[11px] font-mono text-ink/50">
                         Created {rx.createdAt} by {rx.doctorName}
                       </span>
                     </div>
-                    <Badge
-                      className={
-                        rx.status === "Dispensed"
-                          ? "bg-calm/15 text-calm border-calm/30"
-                          : "bg-warn/15 text-warn border-warn/30"
-                      }
-                    >
-                      {rx.status}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        className={
+                          rx.status === "Dispensed"
+                            ? "bg-calm/15 text-calm border-calm/30"
+                            : "bg-warn/15 text-warn border-warn/30"
+                        }
+                      >
+                        {rx.status}
+                      </Badge>
+                      <AIActionButton
+                        label="Explain Rx"
+                        featureName={`Prescription Explanation (#${rx.id})`}
+                        actionType="explain_prescription"
+                        role="doctor"
+                        patientId={patient.id}
+                        getContextData={() => ({ prescription: rx, patient })}
+                        className="text-[11px] h-7 px-2"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          exportPrescriptionPdf({
+                            id: rx.id,
+                            patientId: patient.id,
+                            patientName: patient.name,
+                            doctorName: rx.doctorName,
+                            createdAt: rx.createdAt,
+                            notes: rx.notes,
+                            items: rx.items,
+                          });
+                          toast.success(`Prescription #${rx.id} downloaded as PDF`);
+                        }}
+                        className="text-[11px] h-7 px-2 border-border bg-card text-ink hover:bg-surf cursor-pointer"
+                      >
+                        <FileText className="size-3 mr-1 text-brand" /> PDF
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent className="p-4">
                     <div className="space-y-2">
@@ -484,18 +546,51 @@ function PatientProfilePage() {
                   <div>
                     <CardTitle className="text-sm font-bold text-ink">{test.testName}</CardTitle>
                     <span className="text-[11px] font-mono text-ink/50">
-                      Requisition {test.id} · Priority: {test.priority}
+                      Requisition #{test.id} · Priority: {test.priority}
                     </span>
                   </div>
-                  <Badge
-                    className={
-                      test.status === "Completed"
-                        ? "bg-calm/15 text-calm border-calm/30"
-                        : "bg-warn/15 text-warn border-warn/30"
-                    }
-                  >
-                    {test.status}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className={
+                        test.status === "Completed"
+                          ? "bg-calm/15 text-calm border-calm/30"
+                          : "bg-warn/15 text-warn border-warn/30"
+                      }
+                    >
+                      {test.status}
+                    </Badge>
+                    <AIActionButton
+                      label="AI Summary"
+                      featureName={`AI Analysis — ${test.testName}`}
+                      actionType="summarize_report"
+                      role="doctor"
+                      patientId={patient.id}
+                      getContextData={() => ({ report: test, patient })}
+                      className="text-[11px] h-7 px-2"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        exportLabReportPdf({
+                          id: test.id,
+                          testName: test.testName,
+                          patientId: patient.id,
+                          patientName: patient.name,
+                          doctorName: test.doctorName,
+                          orderedAt: test.orderedAt,
+                          completedAt: test.completedAt,
+                          priority: test.priority,
+                          labNotes: test.labNotes,
+                          results: test.results,
+                        });
+                        toast.success(`Lab Report #${test.id} downloaded as PDF`);
+                      }}
+                      className="text-[11px] h-7 px-2 border-border bg-card text-ink hover:bg-surf cursor-pointer"
+                    >
+                      <FileText className="size-3 mr-1 text-brand" /> PDF
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-4">
                   {test.results ? (

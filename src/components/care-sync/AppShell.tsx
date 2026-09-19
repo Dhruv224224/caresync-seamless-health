@@ -33,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/care-sync/Logo";
 import { NotificationCenter } from "@/components/care-sync/NotificationCenter";
 import { GlobalSearchDialog } from "@/components/care-sync/GlobalSearchDialog";
-import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton";
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
 import { useTheme } from "@/components/care-sync/ThemeToggle";
 import { useCareSync, getRoleHomePath } from "@/lib/store";
 import { Role } from "@/types/caresync";
@@ -256,10 +256,22 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                 </kbd>
               </button>
 
-              {/* AI Assistant Placeholder */}
-              <AIPlaceholderButton
+              {/* AI Assistant Functional Button */}
+              <AIActionButton
                 label="Ask CareSync"
                 featureName="CareSync Hospital Operations Assistant"
+                actionType="ask"
+                role={role}
+                patientId="CS-001"
+                getContextData={() => {
+                  const targetPatient = patients[0] || { id: "CS-001", name: "Rajesh Sharma" };
+                  return {
+                    patient: targetPatient,
+                    prescriptions: prescriptions.filter((p) => p.patientId === targetPatient.id),
+                    tests: testOrders.filter((t) => t.patientId === targetPatient.id),
+                    role,
+                  };
+                }}
                 className="hidden xl:flex text-xs h-8 px-2.5"
               />
 

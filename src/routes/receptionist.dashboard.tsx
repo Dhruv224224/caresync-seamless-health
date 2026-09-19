@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
+import { exportPatientSummaryPdf } from "@/lib/pdfGenerator";
 import {
   Select,
   SelectContent,
@@ -406,7 +408,21 @@ function ReceptionistDashboardPage() {
                         {patient.status}
                       </Badge>
                     </td>
-                    <td className="p-2.5 pr-3.5 text-right">
+                    <td className="p-2.5 pr-3.5 text-right flex items-center justify-end gap-1.5">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          exportPatientSummaryPdf({
+                            patient,
+                          });
+                          toast.success(`UHID Slip & Summary for ${patient.name} downloaded as PDF`);
+                        }}
+                        className="text-xs h-7 px-2 border-border bg-card text-ink hover:bg-surf"
+                        title="Download UHID Summary PDF"
+                      >
+                        PDF
+                      </Button>
                       <Button
                         asChild
                         size="sm"

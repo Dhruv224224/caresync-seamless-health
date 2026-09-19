@@ -17,6 +17,8 @@ import { AppShell } from "@/components/care-sync/AppShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
+import { exportPrescriptionPdf } from "@/lib/pdfGenerator";
 import { useCareSync } from "@/lib/store";
 import { toast } from "sonner";
 
@@ -208,25 +210,56 @@ function PharmacyDashboardPage() {
                       ))}
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between">
+                    <div className="pt-2 flex flex-wrap items-center justify-between gap-2">
                       <div className="text-[10px] text-ink/50 font-mono">
                         Requisition #{rx.id} · Barcode Verified
                       </div>
 
-                      {rx.status === "Pending" ? (
+                      <div className="flex items-center gap-2">
+                        <AIActionButton
+                          label="Explain Rx"
+                          featureName={`Dosage & Administration (#${rx.id})`}
+                          actionType="explain_prescription"
+                          role="pharmacy"
+                          patientId={rx.patientId}
+                          getContextData={() => ({ prescription: rx })}
+                          className="text-[10px] h-7 px-2"
+                        />
                         <Button
-                          onClick={() => handleDispense(rx.id, rx.patientName)}
                           size="sm"
-                          className="bg-brand hover:bg-brand/90 text-primary-foreground text-xs h-7 px-3 shadow-xs"
+                          variant="outline"
+                          onClick={() => {
+                            exportPrescriptionPdf({
+                              id: rx.id,
+                              patientId: rx.patientId,
+                              patientName: rx.patientName,
+                              doctorName: rx.doctorName,
+                              createdAt: rx.createdAt,
+                              notes: rx.notes,
+                              items: rx.items,
+                            });
+                            toast.success(`Prescription #${rx.id} downloaded as PDF`);
+                          }}
+                          className="text-[10px] h-7 px-2 border-border bg-card text-ink hover:bg-surf"
                         >
-                          <PackageCheck className="size-3.5 mr-1.5" /> Dispense Medicines
+                          PDF
                         </Button>
-                      ) : (
-                        <div className="flex items-center gap-1.5 text-xs text-calm font-semibold font-mono">
-                          <CheckCircle2 className="size-3.5" /> Dispensed at{" "}
-                          {rx.dispensedAt || "Recent"}
-                        </div>
-                      )}
+
+                        {rx.status === "Pending" ? (
+                          <Button
+                            onClick={() => handleDispense(rx.id, rx.patientName)}
+                            size="sm"
+                            className="bg-brand hover:bg-brand/90 text-primary-foreground text-xs h-7 px-3 shadow-xs"
+                          >
+                            <PackageCheck className="size-3.5 mr-1.5" /> Dispense Medicines
+                          </Button>
+                        ) : (
+                          <div className="flex items-center gap-1.5 text-xs text-calm font-semibold font-mono">
+                            <CheckCircle2 className="size-3.5" /> Dispensed at{" "}
+                            {rx.dispensedAt || "Recent"}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

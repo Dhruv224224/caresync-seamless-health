@@ -142,20 +142,21 @@ function LoginPage() {
       </div>
 
       {/* Left Column: Brand Hero */}
-      <div className="hidden lg:flex lg:col-span-6 xl:col-span-7 bg-brand flex-col justify-between p-12 text-white relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-20 -bottom-20 size-[36rem] rounded-full bg-calm/10 blur-3xl" />
-        <div className="pointer-events-none absolute left-10 top-10 size-72 rounded-full bg-white/5 blur-2xl" />
+      <div className="hidden lg:flex lg:col-span-6 xl:col-span-7 bg-gradient-to-br from-blue-900 via-blue-950 to-slate-950 flex-col justify-between p-12 text-white relative overflow-hidden border-r border-blue-900/40 selection:bg-teal-400/30 selection:text-white">
+        <div className="pointer-events-none absolute -right-20 -bottom-20 size-[36rem] rounded-full bg-teal-500/15 blur-3xl" />
+        <div className="pointer-events-none absolute left-10 top-10 size-72 rounded-full bg-blue-500/15 blur-2xl" />
 
         <div className="relative z-10">
-          <Logo compact />
+          <Logo compact onDark />
           <div className="mt-16 max-w-lg">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-calm ring-1 ring-white/15 backdrop-blur">
-              <span className="size-1.5 rounded-full bg-calm" /> Connected Care Operations
+            <span className="inline-flex items-center gap-2 rounded-full bg-blue-900/60 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider text-emerald-300 ring-1 ring-emerald-400/40 backdrop-blur shadow-sm">
+              <span className="size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse" /> CONNECTED CARE OPERATIONS
             </span>
-            <h1 className="mt-6 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-              One Continuous Digital Patient Journey.
+            <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl drop-shadow-xs">
+              One Continuous Digital <br />
+              <span className="text-blue-100">Patient Journey.</span>
             </h1>
-            <p className="mt-4 text-base text-white/80 leading-relaxed">
+            <p className="mt-4 text-base text-blue-100/90 leading-relaxed font-normal">
               CareSync connects registration, clinical consultations, automated lab orders, smart
               pharmacy dispensing, nursing vitals, and surgical milestones into a unified digital
               thread.
@@ -164,18 +165,20 @@ function LoginPage() {
         </div>
 
         {/* Demo Fast-Track Highlight */}
-        <div className="relative z-10 mt-12 rounded-2xl bg-white/10 p-6 backdrop-blur-xl border border-white/15">
+        <div className="relative z-10 mt-12 rounded-2xl bg-blue-900/40 p-6 backdrop-blur-xl border border-blue-400/25 shadow-lg">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-calm font-mono text-xs uppercase tracking-wider">
-              <Zap className="size-4" /> Judge & Evaluator Fast Track
+            <div className="flex items-center gap-2 text-emerald-300 font-mono text-xs font-bold uppercase tracking-wider">
+              <Zap className="size-4 text-emerald-300 fill-emerald-300/30" /> JUDGE & EVALUATOR FAST TRACK
             </div>
-            <span className="text-[11px] font-mono text-white/60">Instant Role Switch</span>
+            <span className="text-[11px] font-mono font-medium text-blue-100/90 bg-blue-950/60 px-2 py-0.5 rounded border border-blue-400/20">
+              Instant Role Switch
+            </span>
           </div>
-          <p className="mt-2 text-xs text-white/80">
+          <p className="mt-2.5 text-xs text-blue-100/90 font-normal leading-relaxed">
             Select any persona below or on the right to jump directly into full cross-department
             live workflows.
           </p>
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-4 grid grid-cols-3 gap-2.5">
             {[
               { role: "doctor", label: "Doctor", path: "/doctor/dashboard" },
               { role: "lab", label: "Laboratory", path: "/lab/dashboard" },
@@ -183,19 +186,26 @@ function LoginPage() {
             ].map((p) => (
               <button
                 key={p.role}
+                type="button"
                 onClick={() => handleQuickDemoRole(p.role as Role, p.path)}
-                className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-left border border-white/10 transition-colors flex items-center justify-between"
+                className="p-2.5 rounded-lg bg-blue-950/70 hover:bg-blue-800/80 active:bg-blue-700 text-xs font-semibold text-white text-left border border-blue-400/30 hover:border-teal-300/60 transition-all flex items-center justify-between shadow-sm cursor-pointer group"
               >
-                <span>{p.label}</span>
-                <ArrowRight className="size-3 text-calm" />
+                <span className="text-white group-hover:text-emerald-200 transition-colors">{p.label}</span>
+                <ArrowRight className="size-3.5 text-emerald-300 group-hover:translate-x-0.5 transition-transform" />
               </button>
             ))}
           </div>
         </div>
 
-        <div className="relative z-10 flex items-center justify-between text-xs text-white/60 font-mono">
-          <span>CareSync Hospital Automation</span>
-          <span>Supabase Auth Integrated</span>
+        <div className="relative z-10 flex items-center justify-between text-xs text-blue-200/90 font-mono font-medium pt-4">
+          <span className="flex items-center gap-1.5">
+            <span className="size-1.5 rounded-full bg-blue-400" />
+            CareSync Hospital Automation
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-1.5 rounded-full bg-emerald-400" />
+            Supabase Auth Integrated
+          </span>
         </div>
       </div>
 

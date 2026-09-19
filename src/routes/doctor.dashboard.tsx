@@ -19,10 +19,10 @@ import {
   Bed,
 } from "lucide-react";
 import { AppShell } from "@/components/care-sync/AppShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
 import { useCareSync } from "@/lib/store";
 import { toast } from "sonner";
 
@@ -76,9 +76,14 @@ function DoctorDashboardPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <AIPlaceholderButton
+            <AIActionButton
               label="Structure Notes with AI"
-              featureName="AI Clinical Note Assistant"
+              featureName="Clinical Documentation Assistant"
+              actionType="structure_notes"
+              role="doctor"
+              getContextData={() => ({
+                rawNotes: "Patient presents with intermittent dry cough for 4 days, mild low grade evening fever, throat irritation. Vitals checked: BP 120/80, Pulse 76, Temp 99.1F. Chest clear bilaterally on auscultation.",
+              })}
               className="text-xs h-8"
             />
             <Button

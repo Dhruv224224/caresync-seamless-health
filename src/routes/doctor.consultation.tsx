@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton";
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
 import { useCareSync } from "@/lib/store";
 import { PrescriptionItem } from "@/types/caresync";
 import { toast } from "sonner";
@@ -247,9 +247,26 @@ function DoctorConsultationPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <AIPlaceholderButton
+            <AIActionButton
               label="Structure Notes with AI"
               featureName="AI Clinical Note Assistant"
+              actionType="structure_notes"
+              role="doctor"
+              getContextData={() => ({
+                patient: selectedPatient,
+                symptoms,
+                clinicalNotes,
+                diagnosis,
+                treatmentPlan,
+                rawNotes: `${symptoms}\n${clinicalNotes}\n${diagnosis}\n${treatmentPlan}`,
+              })}
+              onStructuredResult={(res) => {
+                if (res.symptoms) setSymptoms(res.symptoms);
+                if (res.vitalsAssessment) setClinicalNotes(res.vitalsAssessment);
+                if (res.diagnosis) setDiagnosis(res.diagnosis);
+                if (res.treatmentPlan) setTreatmentPlan(res.treatmentPlan);
+                toast.success("Clinical notes structured into standard fields");
+              }}
               className="text-xs h-9"
             />
             <Button
@@ -315,10 +332,20 @@ function DoctorConsultationPage() {
                 <CardTitle className="text-sm font-semibold text-ink flex items-center gap-2">
                   <Stethoscope className="size-4 text-brand" /> Clinical Observations & Diagnosis
                 </CardTitle>
-                <AIPlaceholderButton
+                <AIActionButton
                   label="Format with AI"
                   featureName="Clinical Note Formatter"
+                  actionType="structure_notes"
+                  role="doctor"
                   size="sm"
+                  getContextData={() => ({
+                    rawNotes: `${symptoms}\n${clinicalNotes}`,
+                  })}
+                  onStructuredResult={(res) => {
+                    if (res.symptoms) setSymptoms(res.symptoms);
+                    if (res.vitalsAssessment) setClinicalNotes(res.vitalsAssessment);
+                    toast.success("Notes formatted");
+                  }}
                   className="text-[11px] h-7"
                 />
               </CardHeader>

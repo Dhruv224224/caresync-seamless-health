@@ -19,6 +19,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
+import { exportLabReportPdf } from "@/lib/pdfGenerator";
 import { useCareSync } from "@/lib/store";
 import { TestOrder } from "@/types/caresync";
 import { toast } from "sonner";
@@ -367,9 +369,59 @@ function LabDashboardPage() {
               </div>
 
               <div className="flex items-center justify-between pt-3 border-t border-border">
-                <div className="flex items-center gap-1.5 text-[11px] font-mono text-ink/50">
-                  <UploadCloud className="size-4 text-brand" /> PDF report auto-generated
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (selectedOrder) {
+                        exportLabReportPdf({
+                          id: selectedOrder.id,
+                          testName: selectedOrder.testName,
+                          patientId: selectedOrder.patientId,
+                          patientName: selectedOrder.patientName,
+                          doctorName: selectedOrder.doctorName,
+                          orderedAt: selectedOrder.orderedAt,
+                          priority: selectedOrder.priority,
+                          labNotes: technicianNotes,
+                          results: [
+                            { parameter: "Hemoglobin (Hb)", value: `${param1Val} g/dL`, referenceRange: "13.0 - 17.0", status: "Normal" },
+                            { parameter: "Total Leucocyte Count (TLC)", value: `${param2Val} /cumm`, referenceRange: "4,000 - 11,000", status: "Normal" },
+                            { parameter: "Platelet Count", value: `${param3Val} /cumm`, referenceRange: "150,000 - 450,000", status: "Normal" },
+                          ],
+                        });
+                        toast.success(`Lab Report #${selectedOrder.id} downloaded as PDF`);
+                      }
+                    }}
+                    className="text-xs h-8 border-border bg-surf text-ink hover:bg-card"
+                  >
+                    <UploadCloud className="size-3.5 mr-1 text-brand" /> Download Report PDF
+                  </Button>
+
+                  {selectedOrder && (
+                    <AIActionButton
+                      label="AI Summary"
+                      featureName={`Diagnostic Summary — ${selectedOrder.testName}`}
+                      actionType="summarize_report"
+                      role="lab"
+                      patientId={selectedOrder.patientId}
+                      getContextData={() => ({
+                        report: {
+                          ...selectedOrder,
+                          labNotes: technicianNotes,
+                          results: [
+                            { parameter: "Hemoglobin (Hb)", value: `${param1Val} g/dL`, referenceRange: "13.0 - 17.0", status: "Normal" },
+                            { parameter: "Total Leucocyte Count (TLC)", value: `${param2Val} /cumm`, referenceRange: "4,000 - 11,000", status: "Normal" },
+                            { parameter: "Platelet Count", value: `${param3Val} /cumm`, referenceRange: "150,000 - 450,000", status: "Normal" },
+                          ],
+                        },
+                      })}
+                      className="text-xs h-8"
+                    />
+                  )}
                 </div>
+
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"

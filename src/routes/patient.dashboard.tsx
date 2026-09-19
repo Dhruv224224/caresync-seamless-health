@@ -20,11 +20,17 @@ import {
   UserRound,
 } from "lucide-react";
 import { AppShell } from "@/components/care-sync/AppShell";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AIPlaceholderButton } from "@/components/care-sync/AIPlaceholderButton";
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
+import {
+  exportPatientSummaryPdf,
+  exportPrescriptionPdf,
+  exportLabReportPdf,
+  exportInvoicePdf,
+} from "@/lib/pdfGenerator";
 import { useCareSync } from "@/lib/store";
 import { toast } from "sonner";
 
@@ -163,15 +169,35 @@ function PatientDashboardPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <AIPlaceholderButton
+            <AIActionButton
               label="Explain in Simple Terms"
-              featureName="AI Medical Explainer"
+              featureName="CareSync Patient Medical Explainer"
+              actionType="explain_simple"
+              role="patient"
+              patientId={patient.id}
+              getContextData={() => ({
+                patient,
+                vitals: patientVitals,
+                prescriptions: patientPrescriptions,
+                tests: patientTests,
+                timeline: patientTimeline,
+              })}
               className="text-xs h-8"
             />
             <Button
-              onClick={() => toast.success("Digital Health Record downloaded as PDF")}
+              onClick={() => {
+                toast.info("Preparing comprehensive health record PDF...");
+                exportPatientSummaryPdf({
+                  patient,
+                  vitals: patientVitals,
+                  prescriptions: patientPrescriptions,
+                  tests: patientTests,
+                  timeline: patientTimeline,
+                });
+                toast.success("Health Record PDF downloaded");
+              }}
               variant="outline"
-              className="border-border text-xs h-8 bg-card text-ink"
+              className="border-border text-xs h-8 bg-card text-ink hover:bg-surf cursor-pointer"
             >
               <Download className="size-3.5 mr-1.5 text-brand" /> Download Record
             </Button>
@@ -430,15 +456,45 @@ function PatientDashboardPage() {
                         {rx.doctorName} · {rx.createdAt}
                       </span>
                     </div>
-                    <Badge
-                      className={`text-[10px] font-mono ${
-                        rx.status === "Dispensed"
-                          ? "bg-calm/15 text-calm border-calm/30"
-                          : "bg-warn/15 text-warn border-warn/30"
-                      }`}
-                    >
-                      {rx.status}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        className={`text-[10px] font-mono ${
+                          rx.status === "Dispensed"
+                            ? "bg-calm/15 text-calm border-calm/30"
+                            : "bg-warn/15 text-warn border-warn/30"
+                        }`}
+                      >
+                        {rx.status}
+                      </Badge>
+                      <AIActionButton
+                        label="Explain Rx"
+                        featureName={`Prescription Explanation (#${rx.id})`}
+                        actionType="explain_prescription"
+                        role="patient"
+                        patientId={patient.id}
+                        getContextData={() => ({ prescription: rx, patient })}
+                        className="text-[11px] h-7 px-2"
+                      />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          exportPrescriptionPdf({
+                            id: rx.id,
+                            patientId: patient.id,
+                            patientName: patient.name,
+                            doctorName: rx.doctorName,
+                            createdAt: rx.createdAt,
+                            notes: rx.notes,
+                            items: rx.items,
+                          });
+                          toast.success(`Prescription #${rx.id} PDF downloaded`);
+                        }}
+                        className="text-[11px] h-7 px-2 border-border bg-card text-ink hover:bg-surf"
+                      >
+                        <Download className="size-3 mr-1 text-brand" /> PDF
+                      </Button>
+                    </div>
                   </CardHeader>
                   <CardContent className="p-3.5 space-y-2">
                     {rx.items.map((item) => (
@@ -474,15 +530,48 @@ function PatientDashboardPage() {
                       Requisition #{test.id} · Ordered by {test.doctorName}
                     </span>
                   </div>
-                  <Badge
-                    className={`text-[10px] font-mono ${
-                      test.status === "Completed"
-                        ? "bg-calm/15 text-calm border-calm/30"
-                        : "bg-warn/15 text-warn border-warn/30"
-                    }`}
-                  >
-                    {test.status}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className={`text-[10px] font-mono ${
+                        test.status === "Completed"
+                          ? "bg-calm/15 text-calm border-calm/30"
+                          : "bg-warn/15 text-warn border-warn/30"
+                      }`}
+                    >
+                      {test.status}
+                    </Badge>
+                    <AIActionButton
+                      label="Summarize Report"
+                      featureName={`AI Summary — ${test.testName}`}
+                      actionType="summarize_report"
+                      role="patient"
+                      patientId={patient.id}
+                      getContextData={() => ({ report: test, patient })}
+                      className="text-[11px] h-7 px-2"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        exportLabReportPdf({
+                          id: test.id,
+                          testName: test.testName,
+                          patientId: patient.id,
+                          patientName: patient.name,
+                          doctorName: test.doctorName,
+                          orderedAt: test.orderedAt,
+                          completedAt: test.completedAt,
+                          priority: test.priority,
+                          labNotes: test.labNotes,
+                          results: test.results,
+                        });
+                        toast.success(`Lab Report #${test.id} PDF downloaded`);
+                      }}
+                      className="text-[11px] h-7 px-2 border-border bg-card text-ink hover:bg-surf"
+                    >
+                      <Download className="size-3 mr-1 text-brand" /> PDF
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-3.5">
                   {test.results ? (
@@ -529,9 +618,59 @@ function PatientDashboardPage() {
               </CardHeader>
               <CardContent className="p-4 space-y-2.5 text-xs">
                 {[
-                  { title: "OPD Initial Consultation Report", date: "Today", size: "245 KB" },
-                  { title: "Diagnostic Lab Sign-Off", date: "Today", size: "180 KB" },
-                  { title: "Admission & Consent Document", date: "Today", size: "320 KB" },
+                  {
+                    title: "OPD Initial Consultation Report",
+                    date: "Today",
+                    size: "PDF",
+                    handler: () => {
+                      exportPatientSummaryPdf({
+                        patient,
+                        vitals: patientVitals,
+                        prescriptions: patientPrescriptions,
+                        tests: patientTests,
+                        timeline: patientTimeline,
+                      });
+                      toast.success("Consultation & Care Summary downloaded as PDF");
+                    },
+                  },
+                  {
+                    title: "Diagnostic Lab Sign-Off",
+                    date: "Today",
+                    size: "PDF",
+                    handler: () => {
+                      if (patientTests[0]) {
+                        exportLabReportPdf({
+                          id: patientTests[0].id,
+                          testName: patientTests[0].testName,
+                          patientId: patient.id,
+                          patientName: patient.name,
+                          doctorName: patientTests[0].doctorName,
+                          orderedAt: patientTests[0].orderedAt,
+                          priority: patientTests[0].priority,
+                          results: patientTests[0].results,
+                        });
+                        toast.success("Lab Report downloaded as PDF");
+                      }
+                    },
+                  },
+                  {
+                    title: "Active Prescription & Dispensation Slip",
+                    date: "Today",
+                    size: "PDF",
+                    handler: () => {
+                      if (patientPrescriptions[0]) {
+                        exportPrescriptionPdf({
+                          id: patientPrescriptions[0].id,
+                          patientId: patient.id,
+                          patientName: patient.name,
+                          doctorName: patientPrescriptions[0].doctorName,
+                          createdAt: patientPrescriptions[0].createdAt,
+                          items: patientPrescriptions[0].items,
+                        });
+                        toast.success("Prescription slip downloaded as PDF");
+                      }
+                    },
+                  },
                 ].map((doc, idx) => (
                   <div
                     key={idx}
@@ -549,10 +688,10 @@ function PatientDashboardPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => toast.success(`Downloaded ${doc.title}`)}
-                      className="text-xs h-7 border-border bg-card"
+                      onClick={doc.handler}
+                      className="text-xs h-7 border-border bg-card hover:bg-surf cursor-pointer"
                     >
-                      <Download className="size-3 mr-1 text-brand" /> View
+                      <Download className="size-3 mr-1 text-brand" /> Download PDF
                     </Button>
                   </div>
                 ))}
@@ -564,12 +703,45 @@ function PatientDashboardPage() {
           <TabsContent value="bills" className="space-y-3">
             <Card className="border-border bg-card shadow-2xs">
               <CardHeader className="p-3.5 border-b border-border/60 flex flex-row items-center justify-between">
-                <CardTitle className="text-xs font-bold text-ink uppercase tracking-wide">
-                  Hospital Invoices & Pre-Authorization
-                </CardTitle>
-                <Badge className="bg-calm/15 text-calm text-[10px] font-mono border-calm/30">
-                  Pre-Auth Approved
-                </Badge>
+                <div>
+                  <CardTitle className="text-xs font-bold text-ink uppercase tracking-wide">
+                    Hospital Invoices & Pre-Authorization
+                  </CardTitle>
+                  <span className="text-[10px] font-mono text-ink/50">
+                    TPA Claim Ref: TPA-8849-CS · Star Health Insurance
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-calm/15 text-calm text-[10px] font-mono border-calm/30">
+                    Pre-Auth Approved
+                  </Badge>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      exportInvoicePdf({
+                        invoiceNumber: "INV-2026-0891",
+                        patientName: patient.name,
+                        patientId: patient.id,
+                        date: new Date().toLocaleDateString(),
+                        items: [
+                          { description: "OPD Consultation & Registration Fee", amount: 850 },
+                          { description: "Complete Blood Count (CBC) Laboratory Diagnostic", amount: 650 },
+                          { description: "Pharmacy Dispensed Medications (Paracetamol, Amoxicillin)", amount: 1250 },
+                          { description: "Inpatient Ward Stay & Pre-Op Care", amount: 11500 },
+                        ],
+                        subtotal: 14250,
+                        insuranceCovered: 14250,
+                        totalPayable: 0,
+                        status: "Settled / Cashless TPA Approved",
+                      });
+                      toast.success("Hospital Invoice INV-2026-0891 downloaded as PDF");
+                    }}
+                    className="text-[11px] h-7 border-border bg-card text-ink hover:bg-surf cursor-pointer"
+                  >
+                    <Download className="size-3 mr-1 text-brand" /> Download Invoice PDF
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="p-4 space-y-3 text-xs">
                 <div className="grid grid-cols-2 gap-3 pb-3 border-b border-border">
