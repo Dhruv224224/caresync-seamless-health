@@ -121,6 +121,13 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  --color-header-nav-text: var(--header-nav-text-val);
+  --color-header-nav-hover: var(--header-nav-hover-val);
+  --color-header-nav-active: var(--header-nav-active-val);
+  --color-header-nav-accent: var(--header-nav-accent-val);
+  --color-header-icon: var(--header-icon-val);
+  --color-header-icon-active: var(--header-icon-active-val);
+
   --font-sans: var(--font-sans-value);
   --font-mono: var(--font-mono-value);
 }
@@ -160,7 +167,7 @@
 
   /* =========================================================================
      5. MUTED AMBER & DANGER (Restrained Warnings & Critical States)
-     ========================================================= */
+     ========================================================================= */
   --amber-muted: #C6924A;
   --amber-soft: #F7EFDF;
   --danger-muted: #B85C63;
@@ -241,117 +248,141 @@
   --sidebar-accent-foreground: #0B1A2B;
   --sidebar-border: #DCE3EB;
   --sidebar-ring: #183653;
+
+  /* Light Theme Header Navigation Tokens */
+  --header-nav-text-val: #536275;
+  --header-nav-hover-val: #0F1B2D;
+  --header-nav-active-val: #0B1A2B;
+  --header-nav-accent-val: #10253D;
+  --header-icon-val: #536275;
+  --header-icon-active-val: #10253D;
 }
 
 .dark {
   /* =========================================================================
-     GLOBAL DARK MODE — NIGHTSHIFT REFERENCE SYSTEM
+     GLOBAL DARK MODE — BLACK-TONE / NIGHTSHIFT DESIGN SYSTEM
      
-     Level 1 — Page Background : #09131F (Layered navy atmosphere, never #000000)
-     Level 2 — Section/Sidebar : #0D1927
-     Level 3 — Card            : #122033
-     Level 4 — Elevated/Modal  : #172A40
-     Level 5 — Selected/Active : #1A314A
+     Level 1 — Page Background : #05070A (True black-tone foundation)
+     Level 2 — Section/Sidebar : #080C11 (Deep nightshift sub-layer)
+     Level 3 — Card            : #0D1219 (Slightly lifted card surface)
+     Level 4 — Elevated/Modal  : #111923 (Elevated card & modal depth)
+     Level 5 — Selected/Active : #152334 (Active & selected focus surface)
      
-     Borders  : Default #20374D | Strong #2C4B65 | Active #3F79A5 | Focus #5F9ED2
-     Text     : Primary #F4F7FB | Secondary #C7D2DE | Muted #91A1B2 | Very Muted #708295
-     Primary  : #3E8EDB (Hover #58A1E6, Active #3275B6, Light Highlight #73B8F4)
-     Success  : #43C99A (Dark #1D765F, Soft #12392F)
-     AI       : #7168C9 (Accent #8D84E6, Surface #211F3D, Border #443D73, Text #E4E1FF)
-     Warning  : #D0A25D / #CDA15E
-     Danger   : #D47A82 / #C96D77 / #D0777F
+     Borders  : Default #202A35 | Strong #2C3948 | Active #3D6585 | Focus #5EA9E8
+     Text     : Primary #F7F9FC | Secondary #C6D0DB | Muted #97A5B4 | Subtle #788695
+     Primary  : #2F8FEA (Hover #49A3F0, Active #2176C7, Bright Blue #70BAFF)
+     Success  : #38D3A1 (Bright #55E0B2, Deep #176A55, Soft #102B24)
+     AI       : #8D83EA (Bright #A69EF5, Surface #211E39, Text #F7F9FC)
+     Warning  : #E0B45F (Bright #F0C977, Surface #2A2010)
+     Danger   : #E07A84 (Bright #F08B94, Surface #2C171B)
      ========================================================================= */
-  --background: #09131F; /* Primary page background */
-  --foreground: #F4F7FB; /* Primary text: crisp and bright */
-  --card: #122033;       /* Level 3 Card Surface */
-  --card-foreground: #F4F7FB;
-  --popover: #172A40;    /* Level 4 Elevated Popover Surface */
-  --popover-foreground: #F4F7FB;
+  --background: #05070A; /* Primary page background: true black-tone */
+  --foreground: #F7F9FC; /* Primary text: crisp & bright */
+  --card: #0D1219;       /* Level 3 Card Surface */
+  --card-foreground: #F7F9FC;
+  --popover: #111923;    /* Level 4 Elevated Popover / Modal Surface */
+  --popover-foreground: #F7F9FC;
 
   /* Primary Brand: Clinical Blue */
-  --primary: #3E8EDB;
+  --primary: #2F8FEA;
   --primary-foreground: #FFFFFF;
-  --secondary: #0D1927;  /* Level 2 Section / Atmospheric Tone */
-  --secondary-foreground: #C7D2DE;
-  --muted: #172A40;      /* Level 4 Elevated Surface */
-  --muted-foreground: #91A1B2;
-  --accent: #1A314A;     /* Level 5 Selected / Active Surface */
-  --accent-foreground: #73B8F4;
-  --destructive: #C96D77; /* Controlled Muted Danger */
+  --secondary: #080C11;  /* Level 2 Section / Atmospheric Tone */
+  --secondary-foreground: #C6D0DB;
+  --muted: #111923;      /* Level 4 Elevated Surface */
+  --muted-foreground: #97A5B4;
+  --accent: #152334;     /* Level 5 Selected / Active Surface */
+  --accent-foreground: #70BAFF;
+  --destructive: #E07A84; /* Error / Urgent Coral */
   --destructive-foreground: #FFFFFF;
 
-  --border: #20374D;     /* Default visible cool-navy border */
-  --input: #29445D;      /* Input border */
-  --ring: #5F9ED2;       /* Focus ring */
+  --border: #202A35;     /* Default visible cool-navy border */
+  --input: #202A35;      /* Input border */
+  --ring: #5EA9E8;       /* Focus ring */
 
-  --ink: #F4F7FB;
-  --brand: #3E8EDB;      /* Clinical Blue */
-  --calm: #43C99A;       /* Success Teal */
-  --surf: #09131F;       /* Foundation Page */
-  --tealsoft: #12392F;   /* Soft Teal Surface */
-  --warn: #D0A25D;       /* Warning Amber */
-  --crit: #D47A82;       /* Urgent / Danger Coral */
+  --ink: #F7F9FC;
+  --brand: #2F8FEA;      /* Clinical Bright Blue */
+  --calm: #38D3A1;       /* Bright Healthcare Teal */
+  --surf: #05070A;       /* Foundation Page */
+  --tealsoft: #176A55;   /* Deep Healthcare Teal */
+  --warn: #E0B45F;       /* Warning Amber */
+  --crit: #E07A84;       /* Urgent / Danger Coral */
 
   /* Palette mappings */
-  --navy-900: #09131F;
-  --navy-800: #0D1927;
-  --navy-700: #122033;
-  --navy-600: #172A40;
-  --navy-500: #3E8EDB;
+  --navy-900: #05070A;
+  --navy-800: #080C11;
+  --navy-700: #0D1219;
+  --navy-600: #111923;
+  --navy-500: #2F8FEA;
 
-  --teal-primary: #43C99A;
-  --teal-dark: #1D765F;
-  --teal-light: #12392F;
-  --teal-soft: #12392F;
+  --teal-primary: #38D3A1;
+  --teal-dark: #176A55;
+  --teal-light: #102B24;
+  --teal-soft: #102B24;
 
-  --blue-accent: #73B8F4;
-  --blue-soft: #172A40;
-  --blue-hover: #58A1E6;
+  --blue-accent: #70BAFF;
+  --blue-soft: #111923;
+  --blue-hover: #49A3F0;
 
-  --indigo-ai: #7168C9;
-  --indigo-soft: #211F3D;
+  --indigo-ai: #8D83EA;
+  --indigo-soft: #211E39;
 
-  --amber-muted: #D0A25D;
-  --amber-soft: #2B2418;
-  --danger-muted: #D47A82;
-  --danger-soft: #2D1B1F;
+  --amber-muted: #E0B45F;
+  --amber-soft: #2A2010;
+  --danger-muted: #E07A84;
+  --danger-soft: #2C171B;
 
-  --slate-900: #F4F7FB; /* Primary text */
-  --slate-700: #C7D2DE; /* Secondary text */
-  --slate-500: #91A1B2; /* Muted text */
-  --slate-300: #2C4B65; /* Border strong */
-  --slate-200: #20374D; /* Border default */
-  --slate-100: #708295; /* Very muted text */
+  --slate-900: #F7F9FC; /* Primary text */
+  --slate-700: #C6D0DB; /* Secondary text */
+  --slate-500: #97A5B4; /* Muted text */
+  --slate-300: #2C3948; /* Border strong */
+  --slate-200: #202A35; /* Border default */
+  --slate-100: #788695; /* Subtle text */
 
   /* Semantic Extended */
-  --semantic-success: #43C99A;
-  --semantic-success-soft: #12392F;
-  --semantic-warning: #D0A25D;
-  --semantic-warning-soft: #2B2418;
-  --semantic-danger: #D47A82;
-  --semantic-danger-soft: #2D1B1F;
-  --semantic-info: #73B8F4;
-  --semantic-info-soft: #172A40;
-  --semantic-ai: #7168C9;
-  --semantic-ai-soft: #211F3D;
-  --semantic-pharmacy: #43C99A;
-  --semantic-pharmacy-soft: #12392F;
+  --semantic-success: #38D3A1;
+  --semantic-success-soft: #102B24;
+  --semantic-warning: #E0B45F;
+  --semantic-warning-soft: #2A2010;
+  --semantic-danger: #E07A84;
+  --semantic-danger-soft: #2C171B;
+  --semantic-info: #70BAFF;
+  --semantic-info-soft: #111923;
+  --semantic-ai: #8D83EA;
+  --semantic-ai-soft: #211E39;
+  --semantic-pharmacy: #38D3A1;
+  --semantic-pharmacy-soft: #102B24;
 
-  --chart-1: #3E8EDB;
-  --chart-2: #43C99A;
-  --chart-3: #73B8F4;
-  --chart-4: #D0A25D;
-  --chart-5: #7168C9;
+  --chart-1: #2F8FEA;
+  --chart-2: #38D3A1;
+  --chart-3: #70BAFF;
+  --chart-4: #E0B45F;
+  --chart-5: #8D83EA;
+
+  /* Header Navigation Tokens */
+  --header-nav-text: var(--header-nav-text-val);
+  --header-nav-hover: var(--header-nav-hover-val);
+  --header-nav-active: var(--header-nav-active-val);
+  --header-nav-accent: var(--header-nav-accent-val);
+  --header-icon: var(--header-icon-val);
+  --header-icon-active: var(--header-icon-active-val);
 
   /* Sidebar Tokens */
-  --sidebar: #0D1927;
-  --sidebar-foreground: #9CADBD;
-  --sidebar-primary: #3E8EDB;
+  --sidebar: #080C11;
+  --sidebar-foreground: #AEBBC8;
+  --sidebar-primary: #2F8FEA;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #172A40;
-  --sidebar-accent-foreground: #F4F7FB;
-  --sidebar-border: #20374D;
-  --sidebar-ring: #5F9ED2;
+  --sidebar-accent: #142337;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #202A35;
+  --sidebar-ring: #5EA9E8;
+
+  /* Centralized Dark Header Navigation Tokens */
+  --header-nav-text-val: #F1F5F9;
+  --header-nav-hover-val: #FFFFFF;
+  --header-nav-active-val: #FFFFFF;
+  --header-nav-accent-val: #2F8FEA;
+  --header-icon-val: #C7D2DE;
+  --header-icon-active-val: #70BAFF;
 }
 
 @layer base {
@@ -375,31 +406,31 @@
     scroll-behavior: smooth;
   }
 
-  /* Dark mode input background: Nightshift #0D1927 with #29445D border */
+  /* Dark mode input background: Nightshift #0B1017 with #202A35 border */
   .dark input:not([type="checkbox"]):not([type="radio"]),
   .dark textarea,
   .dark select {
-    background-color: #0D1927;
-    border-color: #29445D;
-    color: #F4F7FB;
+    background-color: #0B1017;
+    border-color: #202A35;
+    color: #F7F9FC;
   }
 
   .dark input:hover,
   .dark textarea:hover,
   .dark select:hover {
-    border-color: #35536D;
+    border-color: #2C3948;
   }
 
   .dark input:focus,
   .dark textarea:focus,
   .dark select:focus {
-    border-color: #3E8EDB;
+    border-color: #3D7FAF;
     outline: none;
   }
 
   .dark input::placeholder,
   .dark textarea::placeholder {
-    color: #758799;
+    color: #7F8D9C;
   }
 }
 

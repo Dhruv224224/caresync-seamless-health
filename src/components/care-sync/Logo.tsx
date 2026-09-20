@@ -21,14 +21,14 @@ export function Logo({ compact = false, onDark = false }: { compact?: boolean; o
       <span className={compact ? "hidden sm:block" : "block"}>
         <span
           className={`block text-[15px] font-bold leading-none tracking-tight ${
-            onDark ? "text-white" : "text-slate-900 dark:text-white"
+            onDark ? "text-white" : "text-slate-900 dark:text-[#FFFFFF]"
           }`}
         >
           CareSync
         </span>
         <span
           className={`mt-1 block font-mono text-[9.5px] font-semibold uppercase tracking-[0.14em] ${
-            onDark ? "text-slate-300/80" : "text-slate-500 dark:text-slate-400"
+            onDark ? "text-slate-300/80" : "text-slate-500 dark:text-[#AFC0D0]"
           }`}
         >
           Connected Healthcare

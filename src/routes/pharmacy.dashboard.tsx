@@ -246,7 +246,7 @@ function PharmacyDashboardPage() {
                           <Button
                             onClick={() => handleDispense(rx.id, rx.patientName)}
                             size="sm"
-                            className="bg-navy-900 hover:bg-navy-800 dark:bg-primary dark:text-navy-900 text-white text-xs h-7 px-3 shadow-xs"
+                            className="bg-navy-900 hover:bg-navy-800 dark:bg-primary dark:text-white text-white text-xs h-7 px-3 shadow-xs cursor-pointer"
                           >
                             <PackageCheck className="size-3.5 mr-1.5" /> Dispense Medicines
                           </Button>

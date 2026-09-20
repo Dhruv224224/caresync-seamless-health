@@ -141,22 +141,22 @@ function LoginPage() {
         </Button>
       </div>
 
-      {/* Left Column: Brand Hero — Nightshift 900 / 800 Layered Depth */}
-      <div className="hidden lg:flex lg:col-span-6 xl:col-span-7 bg-navy-900 dark:bg-[#101F30] flex-col justify-between p-12 text-white relative overflow-hidden border-r border-border">
+      {/* Left Column: Brand Hero — Nightshift #05070A Black Tone */}
+      <div className="hidden lg:flex lg:col-span-6 xl:col-span-7 bg-navy-900 dark:bg-[#05070A] flex-col justify-between p-12 text-white relative overflow-hidden border-r border-border dark:border-[#202A35]">
         <div className="pointer-events-none absolute -right-20 -bottom-20 size-[36rem] rounded-full bg-teal-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute left-10 top-10 size-72 rounded-full bg-blue-accent/15 blur-2xl" />
 
         <div className="relative z-10">
           <Logo compact onDark />
           <div className="mt-16 max-w-lg">
-            <span className="inline-flex items-center gap-2 rounded-full bg-navy-800 dark:bg-[#162A3D] px-3.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider text-teal-light dark:text-[#43C7A0] ring-1 ring-teal-primary/30 backdrop-blur shadow-sm">
-              <span className="size-2 rounded-full bg-teal-primary animate-pulse" /> CONNECTED CARE OPERATIONS
+            <span className="inline-flex items-center gap-2 rounded-full bg-navy-800 dark:bg-[#111923] px-3.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider text-teal-light dark:text-[#38D3A1] ring-1 ring-teal-primary/30 dark:ring-[#176A55] backdrop-blur shadow-sm">
+              <span className="size-2 rounded-full bg-teal-primary dark:bg-[#38D3A1] animate-pulse" /> CONNECTED CARE OPERATIONS
             </span>
-            <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
+            <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight text-white dark:text-[#F7F9FC] sm:text-5xl">
               One Continuous Digital <br />
-              <span className="text-[#7DBBEE]">Patient Journey.</span>
+              <span className="text-[#70BAFF]">Patient Journey.</span>
             </h1>
-            <p className="mt-4 text-base text-slate-300 dark:text-[#C5D0DC] leading-relaxed font-normal">
+            <p className="mt-4 text-base text-slate-300 dark:text-[#C6D0DB] leading-relaxed font-normal">
               CareSync connects registration, clinical consultations, automated lab orders, smart
               pharmacy dispensing, nursing vitals, and surgical milestones into a unified digital
               thread.
@@ -164,17 +164,17 @@ function LoginPage() {
           </div>
         </div>
 
-        {/* Demo Fast-Track Highlight (Nightshift Card #162A3D) */}
-        <div className="relative z-10 mt-12 rounded-2xl bg-navy-800/80 dark:bg-[#162A3D] p-6 backdrop-blur-xl border border-border shadow-xl">
+        {/* Demo Fast-Track Highlight (Nightshift Card #0D1219 / #111923) */}
+        <div className="relative z-10 mt-12 rounded-2xl bg-navy-800/80 dark:bg-[#0D1219] p-6 backdrop-blur-xl border border-border dark:border-[#2C3948] shadow-xl">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-teal-light dark:text-[#43C7A0] font-mono text-xs font-bold uppercase tracking-wider">
-              <Zap className="size-4 text-teal-primary" /> JUDGE & EVALUATOR FAST TRACK
+            <div className="flex items-center gap-2 text-teal-light dark:text-[#38D3A1] font-mono text-xs font-bold uppercase tracking-wider">
+              <Zap className="size-4 text-teal-primary dark:text-[#38D3A1]" /> JUDGE & EVALUATOR FAST TRACK
             </div>
-            <span className="text-[11px] font-mono font-medium text-slate-300 dark:text-[#C5D0DC] bg-navy-900 dark:bg-[#101F30] px-2.5 py-0.5 rounded border border-border">
+            <span className="text-[11px] font-mono font-medium text-slate-300 dark:text-[#C6D0DB] bg-navy-900 dark:bg-[#111923] px-2.5 py-0.5 rounded border border-border dark:border-[#202A35]">
               Instant Role Switch
             </span>
           </div>
-          <p className="mt-2.5 text-xs text-slate-300 dark:text-[#C5D0DC] font-normal leading-relaxed">
+          <p className="mt-2.5 text-xs text-slate-300 dark:text-[#C6D0DB] font-normal leading-relaxed">
             Select any persona below or on the right to jump directly into full cross-department
             live workflows.
           </p>
@@ -188,29 +188,29 @@ function LoginPage() {
                 key={p.role}
                 type="button"
                 onClick={() => handleQuickDemoRole(p.role as Role, p.path)}
-                className="p-2.5 rounded-lg bg-navy-900 dark:bg-[#101F30] hover:bg-navy-700 dark:hover:bg-[#1D354C] active:bg-navy-600 text-xs font-semibold text-white text-left border border-border hover:border-teal-primary/60 transition-all flex items-center justify-between shadow-xs cursor-pointer group"
+                className="p-2.5 rounded-lg bg-navy-900 dark:bg-[#111923] hover:bg-navy-700 dark:hover:bg-[#152334] active:bg-navy-600 text-xs font-semibold text-white text-left border border-border dark:border-[#202A35] hover:border-teal-primary/60 dark:hover:border-[#38D3A1]/60 transition-all flex items-center justify-between shadow-xs cursor-pointer group"
               >
-                <span className="text-white group-hover:text-teal-light dark:group-hover:text-[#7DBBEE] transition-colors">{p.label}</span>
-                <ArrowRight className="size-3.5 text-teal-primary group-hover:translate-x-0.5 transition-transform" />
+                <span className="text-white group-hover:text-teal-light dark:group-hover:text-[#70BAFF] transition-colors">{p.label}</span>
+                <ArrowRight className="size-3.5 text-teal-primary dark:text-[#38D3A1] group-hover:translate-x-0.5 transition-transform" />
               </button>
             ))}
           </div>
         </div>
 
-        <div className="relative z-10 flex items-center justify-between text-xs text-slate-400 dark:text-[#9EADBC] font-mono font-medium pt-4">
+        <div className="relative z-10 flex items-center justify-between text-xs text-slate-400 dark:text-[#97A5B4] font-mono font-medium pt-4">
           <span className="flex items-center gap-1.5">
-            <span className="size-1.5 rounded-full bg-blue-accent" />
+            <span className="size-1.5 rounded-full bg-blue-accent dark:bg-[#70BAFF]" />
             CareSync Hospital Automation
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-1.5 rounded-full bg-teal-primary" />
+            <span className="size-1.5 rounded-full bg-teal-primary dark:bg-[#38D3A1]" />
             Supabase Auth Integrated
           </span>
         </div>
       </div>
 
-      {/* Right Column: Sign In & Demo Role Pickers — Nightshift 900 Background */}
-      <div className="lg:col-span-6 xl:col-span-5 flex flex-col justify-center p-6 sm:p-10 lg:p-12 bg-background">
+      {/* Right Column: Sign In & Demo Role Pickers — Nightshift #080C11 Background */}
+      <div className="lg:col-span-6 xl:col-span-5 flex flex-col justify-center p-6 sm:p-10 lg:p-12 bg-background dark:bg-[#080C11]">
         <div className="max-w-md w-full mx-auto space-y-6">
           <div className="lg:hidden mb-4">
             <Logo />
@@ -218,10 +218,10 @@ function LoginPage() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-ink">
+              <h2 className="text-2xl font-bold text-ink dark:text-[#F7F9FC]">
                 {isSignUpMode ? "Create Hospital Account" : "Sign In to CareSync"}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-[#9EADBC] mt-1">
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-[#97A5B4] mt-1">
                 {isSignUpMode
                   ? "Register with Supabase Auth to track your patient health journey."
                   : "Enter your hospital credentials or pick a demo persona below."}
@@ -232,7 +232,7 @@ function LoginPage() {
               variant="outline"
               size="sm"
               onClick={() => setIsSignUpMode((prev) => !prev)}
-              className="text-xs border-border bg-card shrink-0 text-slate-700 dark:text-slate-300"
+              className="text-xs border-border dark:border-[#2C3948] bg-card dark:bg-[#0D1219] shrink-0 text-slate-700 dark:text-[#C6D0DB]"
             >
               {isSignUpMode ? "Sign In Instead" : "Sign Up"}
             </Button>
@@ -243,7 +243,7 @@ function LoginPage() {
             {isSignUpMode && (
               <>
                 <div className="space-y-1.5">
-                  <Label htmlFor="fullName" className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  <Label htmlFor="fullName" className="text-xs font-medium text-slate-700 dark:text-[#C6D0DB]">
                     Full Name
                   </Label>
                   <Input
@@ -252,13 +252,13 @@ function LoginPage() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Ramesh Kumar"
-                    className="bg-card dark:bg-[#101F30] border-border h-10 text-sm"
+                    className="bg-card dark:bg-[#0B1017] border-border dark:border-[#202A35] h-10 text-sm"
                     required
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="phone" className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                  <Label htmlFor="phone" className="text-xs font-medium text-slate-700 dark:text-[#C6D0DB]">
                     Contact Phone Number (Optional)
                   </Label>
                   <Input
@@ -267,14 +267,14 @@ function LoginPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91 98765 43210"
-                    className="bg-card dark:bg-[#101F30] border-border h-10 text-sm font-mono"
+                    className="bg-card dark:bg-[#0B1017] border-border dark:border-[#202A35] h-10 text-sm font-mono"
                   />
                 </div>
               </>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-medium text-slate-700 dark:text-slate-300">
+              <Label htmlFor="email" className="text-xs font-medium text-slate-700 dark:text-[#C6D0DB]">
                 {isSignUpMode ? "Email Address" : "Hospital Email"}
               </Label>
               <Input
@@ -283,14 +283,14 @@ function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="user@hospital.org"
-                className="bg-card dark:bg-[#101F30] border-border h-10 text-sm"
+                className="bg-card dark:bg-[#0B1017] border-border dark:border-[#202A35] h-10 text-sm"
                 required
               />
             </div>
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                <Label htmlFor="password" className="text-xs font-medium text-slate-700 dark:text-[#C6D0DB]">
                   Password
                 </Label>
                 {!isSignUpMode && (
@@ -299,7 +299,7 @@ function LoginPage() {
                     onClick={() =>
                       toast.info("Demo Mode: Click any persona below to sign in instantly.")
                     }
-                    className="text-xs text-navy-800 dark:text-[#65AEED] hover:underline"
+                    className="text-xs text-navy-800 dark:text-[#70BAFF] hover:underline"
                   >
                     Forgot password?
                   </button>
@@ -311,7 +311,7 @@ function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="bg-card dark:bg-[#101F30] border-border h-10 text-sm"
+                className="bg-card dark:bg-[#0B1017] border-border dark:border-[#202A35] h-10 text-sm"
                 required
               />
             </div>
@@ -323,7 +323,7 @@ function LoginPage() {
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(!!checked)}
                 />
-                <label htmlFor="remember" className="text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                <label htmlFor="remember" className="text-xs text-slate-700 dark:text-[#C6D0DB] cursor-pointer">
                   Remember my device for 30 days
                 </label>
               </div>
@@ -332,7 +332,7 @@ function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-navy-900 hover:bg-navy-800 dark:bg-[#347FBE] dark:hover:bg-[#4EA0E8] text-white font-medium h-10 shadow-sm"
+              className="w-full bg-navy-900 hover:bg-navy-800 dark:bg-[#2F8FEA] dark:hover:bg-[#49A3F0] text-white font-medium h-10 shadow-sm cursor-pointer"
             >
               {loading ? (
                 <>
@@ -354,16 +354,16 @@ function LoginPage() {
           {/* Divider */}
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
+              <div className="w-full border-t border-border dark:border-[#202A35]" />
             </div>
             <div className="relative flex justify-center text-xs uppercase font-mono">
-              <span className="bg-background px-3 text-slate-500 dark:text-[#9EADBC] font-medium">Or Enter Via Demo Mode</span>
+              <span className="bg-background dark:bg-[#080C11] px-3 text-slate-500 dark:text-[#97A5B4] font-medium">Or Enter Via Demo Mode</span>
             </div>
           </div>
 
-          {/* 6 Demo Personas (#162A3D card surface) */}
+          {/* 6 Demo Personas (#0D1219 card surface) */}
           <div className="space-y-2">
-            <div className="text-[11px] font-mono text-slate-500 dark:text-[#9EADBC] font-semibold uppercase tracking-wider">
+            <div className="text-[11px] font-mono text-slate-500 dark:text-[#97A5B4] font-semibold uppercase tracking-wider">
               Select Demo Role (Judge Sandbox)
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -417,16 +417,16 @@ function LoginPage() {
                     key={p.role}
                     type="button"
                     onClick={() => handleQuickDemoRole(p.role as Role, p.path)}
-                    className="flex items-center gap-2.5 p-2.5 rounded-xl border border-border bg-card dark:bg-[#162A3D] hover:border-slate-300 dark:hover:border-[#467FAF] text-left transition-all group shadow-2xs cursor-pointer"
+                    className="flex items-center gap-2.5 p-2.5 rounded-xl border border-border dark:border-[#202A35] bg-card dark:bg-[#0D1219] hover:border-slate-300 dark:hover:border-[#2C3948] text-left transition-all group shadow-2xs cursor-pointer"
                   >
-                    <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-secondary dark:bg-[#101F30] text-slate-700 dark:text-[#7DBBEE] group-hover:bg-navy-900 dark:group-hover:bg-[#1D354C] group-hover:text-white transition-colors border border-border">
+                    <div className="grid size-8 shrink-0 place-items-center rounded-lg bg-secondary dark:bg-[#111923] text-slate-700 dark:text-[#70BAFF] group-hover:bg-navy-900 dark:group-hover:bg-[#152334] group-hover:text-white transition-colors border border-border dark:border-[#202A35]">
                       <Icon className="size-4" />
                     </div>
                     <div className="min-w-0 flex-1 leading-tight">
-                      <div className="text-xs font-semibold text-ink group-hover:text-navy-900 dark:group-hover:text-primary truncate">
+                      <div className="text-xs font-semibold text-ink dark:text-[#F7F9FC] group-hover:text-navy-900 dark:group-hover:text-[#70BAFF] truncate">
                         {p.title}
                       </div>
-                      <div className="text-[10px] text-slate-500 dark:text-[#9EADBC] truncate font-mono font-medium">{p.name}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-[#97A5B4] truncate font-mono font-medium">{p.name}</div>
                     </div>
                   </button>
                 );
@@ -435,7 +435,7 @@ function LoginPage() {
           </div>
 
           <div className="text-center pt-2">
-            <Link to="/" className="text-xs font-medium text-slate-500 dark:text-[#9EADBC] hover:text-ink transition-colors">
+            <Link to="/" className="text-xs font-medium text-slate-500 dark:text-[#97A5B4] hover:text-ink dark:hover:text-[#F7F9FC] transition-colors">
               ← Return to Public Landing Page
             </Link>
           </div>

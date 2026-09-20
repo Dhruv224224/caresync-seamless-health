@@ -280,12 +280,12 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="h-8 w-8 text-foreground/80 hover:text-foreground hover:bg-secondary"
+                className="h-8 w-8 text-foreground/80 hover:text-foreground hover:bg-secondary dark:text-[#C7D2DE] dark:hover:text-[#70BAFF] dark:hover:bg-[#111923]"
                 title={`Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} Mode`}
                 aria-label="Toggle theme mode"
               >
                 {resolvedTheme === "dark" ? (
-                  <Sun className="size-4 text-warn transition-transform hover:rotate-45" />
+                  <Sun className="size-4 text-[#F4C95D] transition-transform hover:rotate-45" />
                 ) : (
                   <Moon className="size-4 text-brand transition-transform hover:-rotate-12" />
                 )}
@@ -381,16 +381,18 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                       {...(item.params ? { params: item.params } : {})}
                       {...(item.search ? { search: item.search } : {})}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                      className={`group flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                         isActive
-                          ? "bg-brand/15 text-brand dark:text-foreground font-semibold shadow-2xs border border-brand/30 dark:border-brand/40"
-                          : "text-muted-foreground hover:text-foreground hover:bg-secondary font-medium"
+                          ? "bg-brand/15 dark:bg-[#142337] text-brand dark:text-[#FFFFFF] font-semibold shadow-2xs border border-brand/30 dark:border-[#2F8FEA]/50"
+                          : "text-muted-foreground dark:text-[#AEBBC8] hover:text-foreground dark:hover:text-[#F0F4F8] hover:bg-secondary dark:hover:bg-[#101720] font-medium"
                       }`}
                     >
                       <div className="flex items-center gap-2.5 truncate">
                         <Icon
-                          className={`size-4 shrink-0 ${
-                            isActive ? "text-brand" : "text-muted-foreground group-hover:text-foreground"
+                          className={`size-4 shrink-0 transition-colors ${
+                            isActive
+                              ? "text-brand dark:text-[#70BAFF]"
+                              : "text-muted-foreground dark:text-[#9BAABA] group-hover:text-foreground dark:group-hover:text-[#B9D8F2]"
                           }`}
                         />
                         <span className="truncate">{item.label}</span>
@@ -400,7 +402,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                           className={`rounded px-1.5 py-0.5 font-mono text-[9px] shrink-0 font-medium ${
                             isActive
                               ? "bg-brand text-white shadow-2xs"
-                              : "bg-brand/10 text-brand dark:bg-brand/20 dark:text-blue-accent"
+                              : "bg-brand/10 text-brand dark:bg-brand/20 dark:text-[#70BAFF]"
                           }`}
                         >
                           {item.badge}

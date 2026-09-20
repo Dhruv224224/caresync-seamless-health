@@ -191,7 +191,7 @@ function SurgeryWorkflowPage() {
                       <Button
                         size="sm"
                         onClick={() => handleNextMilestone(idx)}
-                        className="bg-navy-900 hover:bg-navy-800 dark:bg-primary dark:text-navy-900 text-white text-xs h-8 shadow-xs cursor-pointer"
+                        className="bg-navy-900 hover:bg-navy-800 dark:bg-primary dark:text-white text-white text-xs h-8 shadow-xs cursor-pointer"
                       >
                         Advance Milestone <ArrowRight className="size-3.5 ml-1" />
                       </Button>
