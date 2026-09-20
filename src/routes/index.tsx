@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/care-sync/Logo";
 import { SectionLabel } from "@/components/care-sync/SectionLabel";
 import { useTheme } from "@/components/care-sync/ThemeToggle";
+import { Role } from "@/types/caresync";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -171,20 +172,20 @@ function LandingPage() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo />
 
-          <nav className="hidden items-center gap-7 text-xs font-semibold text-ink/70 md:flex">
-            <a href="#journey" className="transition-colors hover:text-brand">
+          <nav className="hidden items-center gap-7 text-xs font-semibold text-slate-700 dark:text-slate-300 md:flex">
+            <a href="#journey" className="transition-colors hover:text-navy-900 dark:hover:text-primary">
               Connected Journey
             </a>
-            <a href="#roles" className="transition-colors hover:text-brand">
+            <a href="#roles" className="transition-colors hover:text-navy-900 dark:hover:text-primary">
               Roles & Workspaces
             </a>
-            <a href="#features" className="transition-colors hover:text-brand">
+            <a href="#features" className="transition-colors hover:text-navy-900 dark:hover:text-primary">
               Key Features
             </a>
-            <a href="#how" className="transition-colors hover:text-brand">
+            <a href="#how" className="transition-colors hover:text-navy-900 dark:hover:text-primary">
               How It Works
             </a>
-            <a href="#safety" className="transition-colors hover:text-brand">
+            <a href="#safety" className="transition-colors hover:text-navy-900 dark:hover:text-primary">
               Safety & Standards
             </a>
           </nav>
@@ -195,28 +196,28 @@ function LandingPage() {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="h-8 w-8 text-ink/70 hover:text-ink hover:bg-surf"
+              className="h-8 w-8 text-slate-700 hover:text-ink hover:bg-secondary dark:text-slate-300"
               title={`Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} Mode`}
               aria-label="Toggle theme mode"
             >
               {resolvedTheme === "dark" ? (
                 <Sun className="size-4 text-warn transition-transform hover:rotate-45" />
               ) : (
-                <Moon className="size-4 text-brand transition-transform hover:-rotate-12" />
+                <Moon className="size-4 text-navy-800 transition-transform hover:-rotate-12" />
               )}
             </Button>
 
             <Button
               asChild
               variant="ghost"
-              className="hidden sm:inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold text-ink/80 hover:text-ink hover:bg-surf"
+              className="hidden sm:inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-ink hover:bg-secondary dark:text-slate-300"
             >
               <Link to="/login">Sign In</Link>
             </Button>
 
             <Button
               asChild
-              className="rounded-lg bg-brand px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm shadow-brand/20 hover:bg-brand/90"
+              className="rounded-lg bg-navy-900 hover:bg-navy-800 dark:bg-primary dark:hover:bg-primary/90 px-4 py-2 text-xs font-semibold text-white dark:text-navy-900 shadow-sm"
             >
               <Link to="/demo">
                 Explore Demo <ArrowRight className="size-3.5 ml-1" />
@@ -243,49 +244,49 @@ function LandingPage() {
               <a
                 href="#journey"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-surf"
+                className="p-2 rounded-md hover:bg-secondary"
               >
                 Connected Journey
               </a>
               <a
                 href="#roles"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-surf"
+                className="p-2 rounded-md hover:bg-secondary"
               >
                 Roles & Workspaces
               </a>
               <a
                 href="#features"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-surf"
+                className="p-2 rounded-md hover:bg-secondary"
               >
                 Key Features
               </a>
               <a
                 href="#how"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-surf"
+                className="p-2 rounded-md hover:bg-secondary"
               >
                 How It Works
               </a>
               <a
                 href="#safety"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-surf"
+                className="p-2 rounded-md hover:bg-secondary"
               >
                 Safety & Standards
               </a>
               <Link
                 to="/demo"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-surf text-brand font-semibold"
+                className="p-2 rounded-md hover:bg-secondary text-navy-900 dark:text-primary font-semibold"
               >
                 Explore Demo →
               </Link>
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-md hover:bg-surf text-ink font-semibold"
+                className="p-2 rounded-md hover:bg-secondary text-ink font-semibold"
               >
                 Sign In to Portal →
               </Link>
@@ -295,34 +296,40 @@ function LandingPage() {
       </header>
 
       <main>
-        {/* HERO SECTION */}
-        <section className="relative overflow-hidden bg-surf py-16 sm:py-24 lg:py-28 border-b border-border/80">
-          <div className="pointer-events-none absolute -left-20 top-10 size-96 rounded-full bg-calm/10 blur-3xl" />
-          <div className="pointer-events-none absolute right-0 top-20 size-96 rounded-full bg-brand/10 blur-3xl" />
+        {/* HERO SECTION — Atmospheric Glow + Nightshift Depth */}
+        <section className="relative overflow-hidden bg-[#F7F9FC] dark:bg-[#09131F] py-16 sm:py-24 lg:py-28 border-b border-border">
+          {/* Subtle illumination glows for dark mode */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-300"
+            style={{
+              background:
+                "radial-gradient(circle at 18% 20%, rgba(46, 134, 220, 0.12), transparent 38%), radial-gradient(circle at 62% 65%, rgba(56, 110, 180, 0.08), transparent 42%), #09131F",
+            }}
+          />
 
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-10 lg:px-8">
             {/* Left Hero Content */}
             <div className="lg:col-span-6 space-y-6">
-              <span className="inline-flex items-center gap-2 rounded-full bg-card/80 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider text-brand ring-1 ring-border shadow-2xs backdrop-blur">
-                <span className="size-1.5 rounded-full bg-calm animate-pulse" />
+              <span className="inline-flex items-center gap-2 rounded-full bg-card px-3.5 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-700 dark:text-[#C7D2DE] border border-border shadow-2xs backdrop-blur">
+                <span className="size-2 rounded-full bg-teal-primary animate-pulse" />
                 CONNECTED HEALTHCARE WORKFLOW
               </span>
 
-              <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight text-ink sm:text-5xl lg:text-[3.25rem]">
+              <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight text-navy-900 dark:text-[#F4F7FB] sm:text-5xl lg:text-[3.25rem]">
                 One Patient. <br />
                 Every Department. <br />
-                <span className="text-brand">In Sync.</span>
+                <span className="text-teal-primary dark:text-[#73B8F4]">In Sync.</span>
               </h1>
 
-              <p className="max-w-xl text-sm sm:text-base leading-relaxed text-ink/70 font-normal">
+              <p className="max-w-xl text-sm sm:text-base leading-relaxed text-slate-700 dark:text-[#C7D2DE] font-normal">
                 CareSync connects registration, consultation, diagnostics, pharmacy, nursing,
-                surgery and recovery into one digital patient journey.
+                surgery and recovery into one continuous digital patient journey.
               </p>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Button
                   asChild
-                  className="rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm shadow-brand/25 hover:bg-brand/90"
+                  className="rounded-lg bg-navy-900 hover:bg-navy-800 dark:bg-[#3E8EDB] dark:hover:bg-[#58A1E6] dark:active:bg-[#3275B6] px-5 py-2.5 text-sm font-semibold text-white shadow-sm cursor-pointer"
                 >
                   <Link to="/demo">
                     Explore Demo <ArrowRight className="size-4 ml-1.5" />
@@ -331,16 +338,16 @@ function LandingPage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="rounded-lg border-border bg-card/80 px-5 py-2.5 text-sm font-semibold text-ink backdrop-blur hover:bg-card"
+                  className="rounded-lg border-border bg-card px-5 py-2.5 text-sm font-semibold text-slate-700 hover:text-ink hover:bg-secondary dark:text-[#C7D2DE] dark:bg-[#122033] dark:border-[#29445D] dark:hover:bg-[#172A40] cursor-pointer"
                 >
                   <a href="#how">See How It Works</a>
                 </Button>
               </div>
 
               {/* Status Bar Indicator */}
-              <div className="flex items-center gap-4 pt-4 border-t border-border/60 text-[11px] font-mono text-ink/50">
+              <div className="flex items-center gap-4 pt-4 border-t border-border text-[11px] font-mono text-slate-500 dark:text-[#91A1B2]">
                 <div className="flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-calm" />
+                  <span className="size-2 rounded-full bg-teal-primary" />
                   <span>Real-Time Sync</span>
                 </div>
                 <span>•</span>
@@ -350,25 +357,25 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Right Hero: Interconnected Patient Workflow Visualizer */}
+            {/* Right Hero: Interconnected Patient Workflow Visualizer (#102033 Outer Card) */}
             <div className="lg:col-span-6">
-              <div className="relative rounded-2xl border border-border bg-card/90 p-5 sm:p-6 shadow-xl backdrop-blur-xl">
-                <div className="flex items-center justify-between pb-4 border-b border-border/60">
+              <div className="relative rounded-2xl border border-border dark:border-[#29445D] bg-card dark:bg-[#102033] p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+                <div className="flex items-center justify-between pb-4 border-b border-border dark:border-[#20374D]">
                   <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-lg bg-brand/10 text-brand grid place-items-center font-bold text-xs font-mono">
+                    <div className="size-10 rounded-xl bg-secondary dark:bg-[#14253A] text-navy-800 dark:text-[#F4F7FB] grid place-items-center font-bold text-xs font-mono border border-border dark:border-[#263F56]">
                       CS-001
                     </div>
                     <div>
-                      <div className="text-sm font-bold text-ink">Rajesh Sharma</div>
-                      <div className="text-[10px] font-mono text-ink/50">
+                      <div className="text-sm font-bold text-ink dark:text-[#F4F7FB]">Rajesh Sharma</div>
+                      <div className="text-[10px] font-mono text-slate-500 dark:text-[#91A1B2] font-medium">
                         54y · Male · B+ · Acute Appendicitis
                       </div>
                     </div>
                   </div>
-                  <Badge className="bg-tealsoft text-calm border-calm/30 text-[10px] font-mono">
-                    <span className="size-1.5 rounded-full bg-calm mr-1 animate-pulse" /> Live In
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-light dark:bg-[#12392F] text-teal-dark dark:text-[#43C99A] border border-teal-primary/30 dark:border-[#1D765F] text-[10px] font-mono font-semibold">
+                    <span className="size-1.5 rounded-full bg-teal-primary animate-pulse" /> Live In
                     Sync
-                  </Badge>
+                  </span>
                 </div>
 
                 {/* Connected Step Cards Grid */}
@@ -421,27 +428,27 @@ function LandingPage() {
                       key={s.step}
                       className={`p-3 rounded-xl border text-xs transition-all ${
                         s.status === "active"
-                          ? "bg-brand/10 border-brand/50 ring-1 ring-brand/30"
+                          ? "bg-muted dark:bg-[#1A314A] border-[#3E8EDB] dark:border-[#3C78A9] ring-1 ring-[#3E8EDB]/40"
                           : s.status === "completed"
-                            ? "bg-surf border-border/80"
-                            : "bg-card/50 border-border/40 opacity-70"
+                            ? "bg-secondary dark:bg-[#14253A] border-border dark:border-[#263F56]"
+                            : "bg-card dark:bg-[#122033]/80 border-border/60 dark:border-[#20374D] opacity-80"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-[10px] text-ink/40 font-semibold">
+                        <span className="font-mono text-[10px] text-slate-500 dark:text-[#91A1B2] font-semibold">
                           {s.step}
                         </span>
                         {s.status === "completed" ? (
-                          <CheckCircle2 className="size-3.5 text-calm" />
+                          <CheckCircle2 className="size-3.5 text-[#43C99A]" />
                         ) : s.status === "active" ? (
-                          <span className="size-2 rounded-full bg-brand animate-ping" />
+                          <span className="size-2 rounded-full bg-[#73B8F4] animate-ping" />
                         ) : (
-                          <Clock className="size-3 text-ink/30" />
+                          <Clock className="size-3 text-slate-400 dark:text-[#708295]" />
                         )}
                       </div>
-                      <div className="mt-2 font-bold text-ink truncate">{s.name}</div>
-                      <div className="text-[10px] text-ink/50 truncate font-mono">{s.dept}</div>
-                      <div className="mt-1 text-[9px] font-mono text-brand font-medium">
+                      <div className="mt-2 font-bold text-ink dark:text-[#F4F7FB] truncate">{s.name}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-[#91A1B2] truncate font-mono">{s.dept}</div>
+                      <div className="mt-1 text-[9px] font-mono text-navy-700 dark:text-[#73B8F4] font-medium">
                         {s.time}
                       </div>
                     </div>
@@ -449,15 +456,15 @@ function LandingPage() {
                 </div>
 
                 {/* Cross-Department Sync Banner */}
-                <div className="mt-4 p-3 rounded-xl bg-surf border border-border/70 flex items-center justify-between text-xs text-ink/70">
+                <div className="mt-4 p-3 rounded-xl bg-secondary dark:bg-[#14253A] border border-border dark:border-[#263F56] flex items-center justify-between text-xs text-slate-700 dark:text-[#C7D2DE]">
                   <span className="flex items-center gap-2">
-                    <Activity className="size-4 text-calm" />
+                    <Activity className="size-4 text-[#43C99A]" />
                     <span>Lab verified report instantly notified Dr. Sharma & Ward 3B</span>
                   </span>
                   <Link
                     to="/doctor/patient/$id"
                     params={{ id: "CS-001" }}
-                    className="font-mono text-[11px] text-brand hover:underline font-semibold"
+                    className="font-mono text-[11px] text-navy-800 dark:text-[#73B8F4] hover:underline font-semibold"
                   >
                     View Chart →
                   </Link>
@@ -468,14 +475,14 @@ function LandingPage() {
         </section>
 
         {/* 2. THE PROBLEM */}
-        <section className="bg-card py-16 sm:py-20 border-b border-border/80">
+        <section className="bg-card py-16 sm:py-20 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl">
               <SectionLabel>The Problem</SectionLabel>
               <h2 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-ink">
                 Healthcare workflows shouldn't depend on fragile paperwork.
               </h2>
-              <p className="mt-2 text-xs sm:text-sm text-ink/65">
+              <p className="mt-2 text-xs sm:text-sm text-slate-700 dark:text-[#C5D0DC]">
                 Traditional hospital departments operate as disconnected islands, causing diagnostic
                 delays, transcription errors, and patient anxiety.
               </p>
@@ -485,12 +492,12 @@ function LandingPage() {
               {problems.map((p) => (
                 <div
                   key={p.code}
-                  className="rounded-xl bg-surf p-5 border border-border hover:border-brand/40 transition-all"
+                  className="rounded-xl bg-secondary dark:bg-[#101F30] p-5 border border-border hover:border-slate-300 dark:hover:border-[#314D66] transition-all"
                 >
-                  <div className="font-mono text-xs font-bold text-brand">{p.code}</div>
+                  <div className="font-mono text-xs font-bold text-navy-800 dark:text-[#65AEED]">{p.code}</div>
                   <h3 className="mt-2 text-sm font-bold text-ink">{p.title}</h3>
-                  <p className="mt-2 text-xs text-ink/65 leading-relaxed">{p.copy}</p>
-                  <div className="mt-4 pt-3 border-t border-border/60 text-[11px] font-mono text-crit font-medium">
+                  <p className="mt-2 text-xs text-slate-700 dark:text-[#C5D0DC] leading-relaxed">{p.copy}</p>
+                  <div className="mt-4 pt-3 border-t border-border text-[11px] font-mono text-danger-muted font-medium">
                     {p.stat}
                   </div>
                 </div>
@@ -500,14 +507,14 @@ function LandingPage() {
         </section>
 
         {/* 3. THE SOLUTION & CONNECTED PATIENT JOURNEY */}
-        <section id="journey" className="bg-surf py-16 sm:py-20 border-b border-border/80">
+        <section id="journey" className="bg-background py-16 sm:py-20 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl">
               <SectionLabel>The Connected Solution</SectionLabel>
               <h2 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-ink">
                 One Continuous Digital Patient Journey
               </h2>
-              <p className="mt-2 text-xs sm:text-sm text-ink/65">
+              <p className="mt-2 text-xs sm:text-sm text-slate-700 dark:text-[#C5D0DC]">
                 Every department accesses and appends to the same verified digital thread in real
                 time.
               </p>
@@ -542,17 +549,17 @@ function LandingPage() {
                 return (
                   <div
                     key={step.title}
-                    className="p-4 rounded-xl bg-card border border-border hover:border-brand/40 transition-all flex flex-col justify-between"
+                    className="p-4 rounded-xl bg-card border border-border hover:border-slate-300 dark:hover:border-[#314D66] transition-all flex flex-col justify-between"
                   >
                     <div>
-                      <div className="size-8 rounded-lg bg-brand/10 text-brand grid place-items-center mb-3">
+                      <div className="size-8 rounded-lg bg-blue-soft text-navy-800 dark:bg-[#1D354C] dark:text-[#65AEED] grid place-items-center mb-3">
                         <Icon className="size-4" />
                       </div>
-                      <div className="text-xs font-mono text-ink/40 font-semibold">
+                      <div className="text-xs font-mono text-slate-500 dark:text-[#9EADBC] font-semibold">
                         Stage 0{idx + 1}
                       </div>
                       <div className="text-sm font-bold text-ink mt-0.5">{step.title}</div>
-                      <div className="text-xs text-ink/60 mt-1 leading-snug">{step.desc}</div>
+                      <div className="text-xs text-slate-700 dark:text-[#C5D0DC] mt-1 leading-snug">{step.desc}</div>
                     </div>
                   </div>
                 );
@@ -562,7 +569,7 @@ function LandingPage() {
         </section>
 
         {/* 4. ROLE-BASED WORKSPACES */}
-        <section id="roles" className="bg-card py-16 sm:py-20 border-b border-border/80">
+        <section id="roles" className="bg-card py-16 sm:py-20 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
@@ -570,13 +577,13 @@ function LandingPage() {
                 <h2 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight text-ink">
                   Designed for Each Hospital Persona
                 </h2>
-                <p className="mt-1 text-xs sm:text-sm text-ink/65">
+                <p className="mt-1 text-xs sm:text-sm text-slate-700 dark:text-[#C5D0DC]">
                   Not 6 copies of the same dashboard. Tailored workflows for every department role.
                 </p>
               </div>
               <Button
                 asChild
-                className="bg-brand hover:bg-brand/90 text-primary-foreground text-xs h-8"
+                className="bg-navy-900 hover:bg-navy-800 text-white dark:bg-[#347FBE] dark:hover:bg-[#4EA0E8] text-xs h-8"
               >
                 <Link to="/demo">
                   Launch Sandbox Demo <ArrowRight className="size-3.5 ml-1" />
@@ -587,35 +594,82 @@ function LandingPage() {
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {roles.map((item) => {
                 const Icon = item.icon;
+                const roleLower = item.role.toLowerCase() as Role;
+                
+                const roleCardStyle: Record<string, {
+                  badge: string;
+                  iconBg: string;
+                  borderHover: string;
+                  btnText: string;
+                }> = {
+                  patient: {
+                    badge: "border-blue-accent/30 bg-blue-soft text-navy-800 dark:bg-[#1D354C] dark:text-[#65AEED]",
+                    iconBg: "bg-blue-soft text-navy-800 dark:bg-[#1D354C] dark:text-[#65AEED]",
+                    borderHover: "hover:border-blue-accent/50",
+                    btnText: "text-navy-900 dark:text-[#65AEED]",
+                  },
+                  receptionist: {
+                    badge: "border-slate-300 bg-secondary text-slate-900 dark:bg-[#1D354C] dark:text-[#F3F7FB]",
+                    iconBg: "bg-secondary text-slate-800 dark:bg-[#1D354C] dark:text-[#F3F7FB]",
+                    borderHover: "hover:border-slate-400",
+                    btnText: "text-slate-900 dark:text-[#F3F7FB]",
+                  },
+                  doctor: {
+                    badge: "border-indigo-ai/30 bg-indigo-soft text-indigo-ai dark:bg-[#252344] dark:text-[#9A91F0]",
+                    iconBg: "bg-indigo-soft text-indigo-ai dark:bg-[#252344] dark:text-[#9A91F0]",
+                    borderHover: "hover:border-indigo-ai/50",
+                    btnText: "text-indigo-ai dark:text-[#9A91F0]",
+                  },
+                  nurse: {
+                    badge: "border-teal-primary/30 bg-teal-light text-teal-dark dark:bg-[#12382F] dark:text-[#43C7A0]",
+                    iconBg: "bg-teal-light text-teal-dark dark:bg-[#12382F] dark:text-[#43C7A0]",
+                    borderHover: "hover:border-teal-primary/50",
+                    btnText: "text-teal-dark dark:text-[#43C7A0]",
+                  },
+                  laboratory: {
+                    badge: "border-blue-accent/30 bg-blue-soft text-blue-hover dark:bg-[#1D354C] dark:text-[#65AEED]",
+                    iconBg: "bg-blue-soft text-blue-hover dark:bg-[#1D354C] dark:text-[#65AEED]",
+                    borderHover: "hover:border-blue-accent/50",
+                    btnText: "text-blue-hover dark:text-[#65AEED]",
+                  },
+                  pharmacy: {
+                    badge: "border-amber-muted/30 bg-amber-soft text-amber-muted dark:bg-[#322616] dark:text-[#D2A85A]",
+                    iconBg: "bg-amber-soft text-amber-muted dark:bg-[#322616] dark:text-[#D2A85A]",
+                    borderHover: "hover:border-amber-muted/50",
+                    btnText: "text-amber-muted dark:text-[#D2A85A]",
+                  },
+                };
+
+                const cardTheme = roleCardStyle[roleLower] || roleCardStyle["doctor"]!;
+
                 return (
                   <div
                     key={item.role}
-                    className="group flex flex-col justify-between rounded-xl border border-border bg-surf p-5 hover:border-brand/40 hover:bg-card transition-all"
+                    className={`group flex flex-col justify-between rounded-2xl border border-border bg-card p-5.5 ${cardTheme.borderHover} hover:shadow-md transition-all`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <div className="size-9 rounded-lg bg-card text-brand border border-border grid place-items-center">
-                          <Icon className="size-4" />
+                        <div className={`size-10 rounded-xl ${cardTheme.iconBg} border border-border grid place-items-center shadow-2xs`}>
+                          <Icon className="size-5" />
                         </div>
-                        <Badge
-                          variant="outline"
-                          className="text-[10px] font-mono border-border bg-card"
+                        <span
+                          className={`text-[10px] font-mono px-2.5 py-0.5 rounded-md border font-semibold uppercase ${cardTheme.badge}`}
                         >
                           {item.role}
-                        </Badge>
+                        </span>
                       </div>
-                      <h3 className="mt-3 text-base font-bold text-ink group-hover:text-brand transition-colors">
+                      <h3 className="mt-3.5 text-base font-bold text-ink group-hover:text-navy-900 dark:group-hover:text-primary transition-colors">
                         {item.role} Workspace
                       </h3>
-                      <p className="mt-2 text-xs text-ink/65 leading-relaxed">{item.desc}</p>
+                      <p className="mt-2 text-xs text-slate-700 dark:text-[#C5D0DC] leading-relaxed">{item.desc}</p>
                     </div>
 
-                    <div className="mt-5 pt-3 border-t border-border/60">
+                    <div className="mt-5 pt-3.5 border-t border-border">
                       <Button
                         asChild
                         size="sm"
                         variant="ghost"
-                        className="w-full text-xs font-semibold text-brand hover:bg-brand/10 justify-between h-8 px-2"
+                        className={`w-full text-xs font-semibold ${cardTheme.btnText} hover:bg-secondary justify-between h-8 px-2 cursor-pointer`}
                       >
                         <Link to={item.path}>
                           <span>Open {item.role} View</span>
@@ -631,7 +685,7 @@ function LandingPage() {
         </section>
 
         {/* 5. KEY FEATURES */}
-        <section id="features" className="bg-surf py-16 sm:py-20 border-b border-border/80">
+        <section id="features" className="bg-background py-16 sm:py-20 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl">
               <SectionLabel>Platform Capabilities</SectionLabel>
@@ -646,16 +700,16 @@ function LandingPage() {
                 return (
                   <div
                     key={f.title}
-                    className="rounded-xl bg-card p-5 border border-border hover:border-brand/40 transition-all"
+                    className="rounded-xl bg-card p-5 border border-border hover:border-slate-300 dark:hover:border-[#314D66] transition-all"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="size-9 rounded-lg bg-brand/10 text-brand grid place-items-center">
+                      <div className="size-9 rounded-lg bg-blue-soft text-navy-800 dark:bg-[#1D354C] dark:text-[#65AEED] grid place-items-center">
                         <Icon className="size-4" />
                       </div>
-                      <span className="text-[10px] font-mono text-brand font-medium">{f.tag}</span>
+                      <span className="text-[10px] font-mono text-slate-700 dark:text-[#9EADBC] font-medium">{f.tag}</span>
                     </div>
                     <h3 className="mt-3 text-sm font-bold text-ink">{f.title}</h3>
-                    <p className="mt-2 text-xs text-ink/65 leading-relaxed">{f.desc}</p>
+                    <p className="mt-2 text-xs text-slate-700 dark:text-[#C5D0DC] leading-relaxed">{f.desc}</p>
                   </div>
                 );
               })}
@@ -664,7 +718,7 @@ function LandingPage() {
         </section>
 
         {/* 6. HOW IT WORKS */}
-        <section id="how" className="bg-card py-16 sm:py-20 border-b border-border/80">
+        <section id="how" className="bg-card py-16 sm:py-20 border-b border-border">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl">
               <SectionLabel>Step-by-Step</SectionLabel>
@@ -701,10 +755,10 @@ function LandingPage() {
                   desc: "All event logs compile into the patient's continuous health record.",
                 },
               ].map((item) => (
-                <div key={item.num} className="rounded-xl bg-surf p-4 border border-border">
-                  <div className="font-mono text-xl font-bold text-brand">{item.num}</div>
+                <div key={item.num} className="rounded-xl bg-secondary dark:bg-[#101F30] p-4 border border-border">
+                  <div className="font-mono text-xl font-bold text-navy-900 dark:text-[#65AEED]">{item.num}</div>
                   <div className="mt-2 text-sm font-bold text-ink">{item.title}</div>
-                  <p className="mt-1.5 text-xs text-ink/65 leading-relaxed">{item.desc}</p>
+                  <p className="mt-1.5 text-xs text-slate-700 dark:text-[#C5D0DC] leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -712,12 +766,12 @@ function LandingPage() {
         </section>
 
         {/* 7. MEDICAL SAFETY & PROTOCOL */}
-        <section id="safety" className="bg-surf py-12 border-b border-border/80">
+        <section id="safety" className="bg-background py-12 border-b border-border">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1 font-mono text-[11px] font-semibold text-ink/70 border border-border">
-              <ShieldCheck className="size-3.5 text-calm" /> Prototype Safety & Compliance Notice
+            <div className="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1 font-mono text-[11px] font-semibold text-slate-700 dark:text-[#C5D0DC] border border-border">
+              <ShieldCheck className="size-3.5 text-teal-primary" /> Prototype Safety & Compliance Notice
             </div>
-            <p className="mt-4 text-xs sm:text-sm text-ink/65 leading-relaxed">
+            <p className="mt-4 text-xs sm:text-sm text-slate-700 dark:text-[#C5D0DC] leading-relaxed">
               CareSync is a hackathon prototype for healthcare workflow demonstration. It is not
               intended for clinical diagnosis, treatment decisions, or real patient data. Fictional
               demo patients and simulated clinical workflows are utilized for educational review.
@@ -725,23 +779,29 @@ function LandingPage() {
           </div>
         </section>
 
-        {/* 8. DEMO CTA */}
-        <section className="bg-brand py-16 text-white text-center">
-          <div className="mx-auto max-w-4xl px-4">
+        {/* 8. DEMO CTA — Nightshift Banner */}
+        <section className="bg-[#101F30] py-16 text-white text-center relative overflow-hidden border-t border-b border-border">
+          <div className="pointer-events-none absolute left-10 top-0 size-72 rounded-full bg-teal-primary/10 blur-3xl" />
+          <div className="pointer-events-none absolute right-10 bottom-0 size-72 rounded-full bg-blue-accent/15 blur-3xl" />
+
+          <div className="relative z-10 mx-auto max-w-4xl px-4">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1 font-mono text-[11px] font-semibold text-teal-light border border-teal-primary/30 mb-4 backdrop-blur">
+              <span className="size-1.5 rounded-full bg-teal-primary animate-pulse" /> LIVE INTERCONNECTED DEMO
+            </span>
             <h2 className="text-2xl sm:text-4xl font-bold tracking-tight">
               Ready to Experience Connected Healthcare?
             </h2>
-            <p className="mt-3 text-sm text-white/80 max-w-xl mx-auto">
+            <p className="mt-3 text-sm text-slate-300 dark:text-[#C5D0DC] max-w-xl mx-auto font-normal">
               Launch the interactive multi-persona prototype now to experience synchronized hospital
-              workflows.
+              workflows across all 6 clinical departments.
             </p>
             <div className="mt-8 flex justify-center gap-3">
               <Button
                 asChild
-                className="bg-white text-brand hover:bg-white/90 text-xs font-semibold h-9 px-5 shadow-lg"
+                className="bg-white text-navy-900 dark:bg-[#347FBE] dark:text-white dark:hover:bg-[#4EA0E8] hover:bg-slate-100 text-xs font-bold h-9 px-5 shadow-lg cursor-pointer"
               >
                 <Link to="/demo">
-                  Launch Demo Hub <ArrowRight className="size-3.5 ml-1" />
+                  Launch Demo Hub <ArrowRight className="size-3.5 ml-1.5 text-teal-primary" />
                 </Link>
               </Button>
             </div>
@@ -750,10 +810,10 @@ function LandingPage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-card py-8 border-t border-border text-xs text-ink/60">
+      <footer className="bg-card py-8 border-t border-border text-xs text-slate-500 dark:text-[#9EADBC]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Logo compact />
-          <div className="text-center sm:text-right text-[11px] font-mono text-ink/50">
+          <div className="text-center sm:text-right text-[11px] font-mono text-slate-500 dark:text-[#9EADBC]">
             CareSync © 2026 · One Patient. Every Department. In Sync.
           </div>
         </div>

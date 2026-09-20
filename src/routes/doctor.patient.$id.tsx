@@ -7,6 +7,7 @@ import {
   MapPin,
   AlertTriangle,
   FileHeart,
+  FileText,
   Stethoscope,
   Pill,
   FlaskConical,
@@ -20,6 +21,7 @@ import {
   Sparkles,
   Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { AppShell } from "@/components/care-sync/AppShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

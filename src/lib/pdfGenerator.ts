@@ -85,7 +85,7 @@ export class SimplePdfDocument {
     let currX = this.leftMargin;
     headers.forEach((h, idx) => {
       this.drawText(h, currX + 4, this.y + 1, 9, [0.11, 0.28, 0.58], true);
-      currX += widths[idx];
+      currX += widths[idx] ?? defaultColWidth;
     });
     this.y -= 20;
 
@@ -99,7 +99,7 @@ export class SimplePdfDocument {
       let rx = this.leftMargin;
       row.forEach((cell, cIdx) => {
         this.drawText(String(cell ?? ""), rx + 4, this.y, 9, [0.2, 0.25, 0.3]);
-        rx += widths[cIdx];
+        rx += widths[cIdx] ?? defaultColWidth;
       });
       this.drawLine(this.leftMargin, this.y - 5, this.rightMargin, this.y - 5, [0.9, 0.92, 0.95], 0.5);
       this.y -= 18;
@@ -157,7 +157,10 @@ export class SimplePdfDocument {
     const g = color[1].toFixed(2);
     const b = color[2].toFixed(2);
     const stream = `BT ${font} ${size} Tf ${r} ${g} ${b} rg 1 0 0 1 ${x} ${y} Tm (${clean}) Tj ET`;
-    this.pages[this.currentPage].push(stream);
+    const page = this.pages[this.currentPage];
+    if (page) {
+      page.push(stream);
+    }
   }
 
   private drawLine(
@@ -172,7 +175,10 @@ export class SimplePdfDocument {
     const g = color[1].toFixed(2);
     const b = color[2].toFixed(2);
     const stream = `${r} ${g} ${b} RG ${width} w ${x1} ${y1} m ${x2} ${y2} l S`;
-    this.pages[this.currentPage].push(stream);
+    const page = this.pages[this.currentPage];
+    if (page) {
+      page.push(stream);
+    }
   }
 
   private drawRect(
@@ -186,7 +192,10 @@ export class SimplePdfDocument {
     const g = fillColor[1].toFixed(2);
     const b = fillColor[2].toFixed(2);
     const stream = `${r} ${g} ${b} rg ${x} ${y} ${w} ${h} re f`;
-    this.pages[this.currentPage].push(stream);
+    const page = this.pages[this.currentPage];
+    if (page) {
+      page.push(stream);
+    }
   }
 
   public toBlob(): Blob {
@@ -291,10 +300,10 @@ export function exportPrescriptionPdf(prescription: {
   patientName: string;
   doctorName: string;
   createdAt: string;
-  notes?: string;
+  notes?: string | undefined;
   items: {
     medicine: string;
-    dosage?: string;
+    dosage?: string | undefined;
     frequency: string;
     duration: string;
     instructions: string;
@@ -342,15 +351,15 @@ export function exportLabReportPdf(report: {
   patientName: string;
   doctorName: string;
   orderedAt: string;
-  completedAt?: string;
+  completedAt?: string | undefined;
   priority: string;
-  labNotes?: string;
+  labNotes?: string | undefined;
   results?: {
     parameter: string;
     value: string;
-    referenceRange?: string;
+    referenceRange?: string | undefined;
     status: string;
-  }[];
+  }[] | undefined;
 }) {
   const doc = new SimplePdfDocument("Diagnostic Lab Report");
   doc.addTitle("DIAGNOSTIC PATHOLOGY & LAB REPORT", `Requisition #${report.id} • Test: ${report.testName}`);
@@ -405,13 +414,13 @@ export function exportPatientSummaryPdf(data: {
     status: string;
     assignedDoctor: string;
     currentDepartment: string;
-    bedNumber?: string;
-    roomNumber?: string;
+    bedNumber?: string | undefined;
+    roomNumber?: string | undefined;
   };
-  vitals?: { recordedAt: string; bloodPressure: string; pulse: string; temperature: string; spO2: string }[];
-  prescriptions?: { id: string; doctorName: string; items: { medicine: string; frequency: string; duration: string }[] }[];
-  tests?: { id: string; testName: string; status: string }[];
-  timeline?: { timestamp: string; title: string; department: string; description: string }[];
+  vitals?: { recordedAt: string; bloodPressure: string; pulse: string; temperature: string; spO2: string }[] | undefined;
+  prescriptions?: { id: string; doctorName: string; items: { medicine: string; frequency: string; duration: string }[] }[] | undefined;
+  tests?: { id: string; testName: string; status: string }[] | undefined;
+  timeline?: { timestamp: string; title: string; department: string; description: string }[] | undefined;
 }) {
   const doc = new SimplePdfDocument("Health Record Summary");
   doc.addTitle("COMPREHENSIVE DIGITAL HEALTH RECORD", `UHID: ${data.patient.id} • ${data.patient.name}`);

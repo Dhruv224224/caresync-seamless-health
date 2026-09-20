@@ -69,7 +69,7 @@ function PatientDashboardPage() {
     }
   }, [search.tab]);
 
-  const { patients, currentUser, authUserId, prescriptions, testOrders, timelines } = useCareSync();
+  const { patients, currentUser, authUserId, prescriptions, testOrders, timelines, vitals } = useCareSync();
 
   // Find patient record for logged-in patient or fallback to first available
   const loggedInPatient = patients.find(
@@ -127,6 +127,8 @@ function PatientDashboardPage() {
       active = false;
     };
   }, [patient.id]);
+
+  const patientVitals = vitals.filter((v) => v.patientId === patient.id);
 
   const patientPrescriptions =
     dbPrescriptions.length > 0

@@ -207,11 +207,11 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
   // If loading session state, render sleek skeleton
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-surf flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <div className="flex flex-col items-center gap-3 bg-card p-8 rounded-2xl border border-border shadow-lg max-w-sm text-center">
           <Loader2 className="size-8 text-brand animate-spin" />
-          <div className="font-bold text-sm text-ink">Verifying Hospital Session</div>
-          <div className="text-xs text-ink/60 font-mono">
+          <div className="font-bold text-sm text-foreground">Verifying Hospital Session</div>
+          <div className="text-xs text-muted-foreground font-mono">
             Synchronizing profile & permissions...
           </div>
         </div>
@@ -220,25 +220,25 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
   }
 
   return (
-    <div className="min-h-screen bg-surf text-foreground flex flex-col justify-between selection:bg-brand/20">
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-brand/20">
       <div>
         {/* Top Header */}
-        <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur-md">
+        <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur-md dark:bg-card/90">
           <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-3 sm:px-6">
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-ink lg:hidden h-8 w-8 hover:bg-surf"
+                className="text-foreground lg:hidden h-8 w-8 hover:bg-secondary"
                 onClick={() => setSidebarOpen((prev) => !prev)}
                 aria-label="Toggle navigation drawer"
               >
                 {sidebarOpen ? <X className="size-4" /> : <Menu className="size-4" />}
               </Button>
               <Logo />
-              <div className="hidden md:flex items-center gap-2 pl-3 border-l border-border/80 text-xs text-ink/60">
+              <div className="hidden md:flex items-center gap-2 pl-3 border-l border-border text-xs text-muted-foreground">
                 <Building2 className="size-3.5 text-brand" />
-                <span className="font-medium text-ink/80">CareSync Hospital · Main Facility</span>
+                <span className="font-medium text-foreground/90">CareSync Hospital · Main Facility</span>
               </div>
             </div>
 
@@ -246,12 +246,12 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               {/* Global Search Button */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="flex items-center gap-2 rounded-lg bg-surf px-2.5 py-1.5 text-xs text-ink/70 border border-border hover:border-brand/40 shadow-2xs transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-secondary px-2.5 py-1.5 text-xs text-muted-foreground border border-border hover:border-brand/40 shadow-2xs transition-colors"
                 title="Search patients by name or ID (⌘K)"
               >
                 <Search className="size-3.5 text-brand" />
-                <span className="hidden sm:inline">Search Patient / UHID...</span>
-                <kbd className="hidden sm:inline-flex rounded bg-card px-1.5 py-0.5 font-mono text-[9px] text-ink/50 border border-border">
+                <span className="hidden sm:inline text-foreground/80">Search Patient / UHID...</span>
+                <kbd className="hidden sm:inline-flex rounded bg-card px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground border border-border">
                   ⌘K
                 </kbd>
               </button>
@@ -280,7 +280,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                 variant="ghost"
                 size="icon"
                 onClick={toggleTheme}
-                className="h-8 w-8 text-ink/70 hover:text-ink hover:bg-surf"
+                className="h-8 w-8 text-foreground/80 hover:text-foreground hover:bg-secondary"
                 title={`Switch to ${resolvedTheme === "dark" ? "Light" : "Dark"} Mode`}
                 aria-label="Toggle theme mode"
               >
@@ -299,7 +299,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                 asChild
                 variant="outline"
                 size="sm"
-                className="hidden sm:flex border-border text-xs font-medium h-8 px-2.5 bg-card hover:bg-surf text-ink"
+                className="hidden sm:flex border-border text-xs font-medium h-8 px-2.5 bg-card hover:bg-secondary text-foreground"
               >
                 <Link to="/demo">
                   <UserCheck className="size-3.5 mr-1.5 text-brand" />
@@ -308,12 +308,12 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               </Button>
 
               {/* Active Role Persona Indicator & Logout */}
-              <div className="flex items-center gap-2 pl-2 border-l border-border/80">
+              <div className="flex items-center gap-2 pl-2 border-l border-border">
                 <div className="size-7 rounded-md bg-brand/10 text-brand grid place-items-center font-bold text-xs border border-brand/20">
                   {currentUser.name.charAt(0)}
                 </div>
                 <div className="hidden lg:block text-left leading-tight">
-                  <div className="text-xs font-semibold text-ink truncate max-w-[120px]">
+                  <div className="text-xs font-semibold text-foreground truncate max-w-[120px]">
                     {currentUser.name}
                   </div>
                   <div className="text-[10px] font-mono text-brand font-medium capitalize">
@@ -327,7 +327,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                     await logout();
                     navigate({ to: "/login" });
                   }}
-                  className="h-8 w-8 text-ink/60 hover:text-crit hover:bg-crit/10"
+                  className="h-8 w-8 text-muted-foreground hover:text-crit hover:bg-crit/10"
                   title="Sign out / Switch user"
                 >
                   <LogOut className="size-3.5" />
@@ -343,7 +343,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
           {sidebarOpen && (
             <div
               onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-30 bg-black/40 backdrop-blur-xs lg:hidden"
+              className="fixed inset-0 z-30 bg-black/65 backdrop-blur-xs lg:hidden"
             />
           )}
 
@@ -351,10 +351,10 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
           <aside
             className={`${
               sidebarOpen ? "fixed inset-y-14 left-0 z-40 w-64 block shadow-2xl" : "hidden"
-            } border-r border-border bg-card p-3 backdrop-blur-md lg:relative lg:block lg:w-56 lg:shrink-0 lg:bg-card/85 lg:shadow-none`}
+            } border-r border-border bg-card p-3 backdrop-blur-md lg:relative lg:block lg:w-56 lg:shrink-0 lg:bg-card/90 lg:shadow-none`}
           >
-            <div className="flex items-center justify-between px-2 pb-2.5 pt-1 border-b border-border/60">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-ink/50 font-semibold">
+            <div className="flex items-center justify-between px-2 pb-2.5 pt-1 border-b border-border">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
                 {role.toUpperCase()} WORKSPACE
               </div>
               <span className="size-1.5 rounded-full bg-calm" />
@@ -383,14 +383,14 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                       onClick={() => setSidebarOpen(false)}
                       className={`flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                         isActive
-                          ? "bg-brand/10 text-brand font-semibold shadow-xs border border-brand/20"
-                          : "text-ink/70 hover:text-ink hover:bg-surf font-medium"
+                          ? "bg-brand/15 text-brand dark:text-foreground font-semibold shadow-2xs border border-brand/30 dark:border-brand/40"
+                          : "text-muted-foreground hover:text-foreground hover:bg-secondary font-medium"
                       }`}
                     >
                       <div className="flex items-center gap-2.5 truncate">
                         <Icon
                           className={`size-4 shrink-0 ${
-                            isActive ? "text-brand" : "text-ink/60"
+                            isActive ? "text-brand" : "text-muted-foreground group-hover:text-foreground"
                           }`}
                         />
                         <span className="truncate">{item.label}</span>
@@ -400,7 +400,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                           className={`rounded px-1.5 py-0.5 font-mono text-[9px] shrink-0 font-medium ${
                             isActive
                               ? "bg-brand text-white shadow-2xs"
-                              : "bg-brand/10 text-brand"
+                              : "bg-brand/10 text-brand dark:bg-brand/20 dark:text-blue-accent"
                           }`}
                         >
                           {item.badge}
@@ -413,8 +413,8 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
             </div>
 
             {/* Quick Switch Persona Card */}
-            <div className="mt-8 rounded-xl bg-surf p-3 border border-border">
-              <div className="text-[11px] font-semibold text-ink flex items-center justify-between">
+            <div className="mt-8 rounded-xl bg-secondary p-3 border border-border">
+              <div className="text-[11px] font-semibold text-foreground flex items-center justify-between">
                 <span>Active Role</span>
                 <Badge
                   variant="outline"
@@ -423,15 +423,15 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
                   {role}
                 </Badge>
               </div>
-              <div className="text-xs text-ink/90 mt-1 font-semibold truncate">
+              <div className="text-xs text-foreground mt-1 font-semibold truncate">
                 {currentUser.name}
               </div>
-              <div className="text-[10px] text-ink/50 font-mono truncate">{currentUser.title}</div>
+              <div className="text-[10px] text-muted-foreground font-mono truncate">{currentUser.title}</div>
               <Button
                 asChild
                 variant="outline"
                 size="sm"
-                className="mt-2.5 w-full text-[11px] h-7 bg-card hover:bg-card/80 border-border text-ink"
+                className="mt-2.5 w-full text-[11px] h-7 bg-card hover:bg-card/80 border-border text-foreground"
               >
                 <Link to="/demo">
                   <span>Switch Role</span>
@@ -446,18 +446,25 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
             {!isRoleAuthorized ? (
               <div className="p-8 text-center bg-card rounded-2xl border border-border shadow-xs space-y-3 max-w-lg mx-auto mt-10">
                 <ShieldAlert className="size-10 text-warn mx-auto" />
-                <div className="text-lg font-bold text-ink">Role Access Restriction</div>
-                <p className="text-xs text-ink/60 leading-relaxed">
-                  Your authenticated account role (
-                  <span className="font-mono font-bold text-brand uppercase">{role}</span>) does not
-                  have authorization to view this department workspace.
+                <div className="text-lg font-bold text-foreground">Role Access Restriction</div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Your active role is <strong>{currentRole}</strong>. You are viewing the{" "}
+                  <strong>{activeRole}</strong> workspace. In CareSync, permissions are enforced by
+                  department role.
                 </p>
                 <div className="pt-2 flex justify-center gap-2">
                   <Button
-                    onClick={() => navigate({ to: getRoleHomePath(role) })}
-                    className="bg-brand text-white text-xs"
+                    onClick={() => setRole(activeRole!)}
+                    className="bg-brand text-white text-xs h-8"
                   >
-                    Go to My Workspace ({role.toUpperCase()})
+                    Switch to {activeRole?.toUpperCase()} Persona
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-border text-xs h-8 bg-card text-foreground"
+                  >
+                    <Link to={getRoleHomePath(currentRole)}>Return to My Workspace</Link>
                   </Button>
                 </div>
               </div>
@@ -468,23 +475,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
         </div>
       </div>
 
-      {/* Hospital Footer Disclaimer */}
-      <footer className="border-t border-border bg-card py-3 px-4 text-xs text-ink/55">
-        <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-ink/75 text-[11px]">
-              CareSync Healthcare Operations
-            </span>
-            <span className="text-ink/30">•</span>
-            <span className="text-[10px] font-mono text-calm">Supabase Auth Connected</span>
-          </div>
-          <span className="text-[10px] text-ink/45 max-w-xl text-center sm:text-right">
-            CareSync Connected Healthcare Digital Thread.
-          </span>
-        </div>
-      </footer>
-
-      {/* Global Patient Search Modal (⌘K) */}
+      {/* Global Command/Search Dialog */}
       <GlobalSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );

@@ -11,9 +11,9 @@ export type AIActionType =
 export interface AIRequestPayload {
   action: AIActionType;
   role: string;
-  patientId?: string;
-  query?: string;
-  contextData?: Record<string, unknown>;
+  patientId?: string | undefined;
+  query?: string | undefined;
+  contextData?: Record<string, unknown> | undefined;
 }
 
 export interface AIResponsePayload {
@@ -74,16 +74,16 @@ function generateDeterministicAIAssistance(
   reason?: string,
 ): AIResponsePayload {
   const { action, role, query, contextData } = payload;
-  const ctx = contextData || {};
+  const ctx: Record<string, any> = (contextData as any) || {};
 
   switch (action) {
     case "explain_simple":
     case "patient_summary": {
-      const patient = (ctx.patient as any) || {};
-      const vitals = (ctx.vitals as any[]) || [];
-      const rx = (ctx.prescriptions as any[]) || [];
-      const tests = (ctx.tests as any[]) || [];
-      const timeline = (ctx.timeline as any[]) || [];
+      const patient = (ctx["patient"] as any) || {};
+      const vitals = (ctx["vitals"] as any[]) || [];
+      const rx = (ctx["prescriptions"] as any[]) || [];
+      const tests = (ctx["tests"] as any[]) || [];
+      const timeline = (ctx["timeline"] as any[]) || [];
 
       const latestVitals = vitals[0] ? `Recent Blood Pressure is ${vitals[0].bloodPressure} mmHg with heart rate ${vitals[0].pulse} bpm.` : "Vitals are stable.";
       const pendingTests = tests.filter((t) => t.status !== "Completed");
@@ -109,7 +109,7 @@ function generateDeterministicAIAssistance(
     }
 
     case "summarize_report": {
-      const report = (ctx.report as any) || {};
+      const report = (ctx["report"] as any) || {};
       const results = report.results || [];
       const abnormal = results.filter((r: any) => r.status && r.status !== "Normal");
 
@@ -141,7 +141,7 @@ function generateDeterministicAIAssistance(
     }
 
     case "explain_prescription": {
-      const rx = (ctx.prescription as any) || {};
+      const rx = (ctx["prescription"] as any) || {};
       const items = rx.items || [];
 
       let explanation = `Prescription Guidance (#${rx.id || "N/A"}) by ${rx.doctorName || "Doctor"}:\n\n`;
@@ -167,7 +167,7 @@ function generateDeterministicAIAssistance(
     }
 
     case "structure_notes": {
-      const rawNotes = String(ctx.rawNotes || ctx.symptoms || "");
+      const rawNotes = String(ctx["rawNotes"] || ctx["symptoms"] || "");
       const lines = rawNotes.split("\n").filter((l) => l.trim().length > 0);
 
       const symptoms = lines.find((l) => /fever|cough|pain|nausea|headache|ache|cold|symptom/i.test(l)) || rawNotes.slice(0, 100);
@@ -202,11 +202,11 @@ function generateDeterministicAIAssistance(
     case "ask":
     default: {
       const q = (query || "").toLowerCase();
-      const patient = (ctx.patient as any) || {};
-      const vitals = (ctx.vitals as any[]) || [];
-      const rx = (ctx.prescriptions as any[]) || [];
-      const tests = (ctx.tests as any[]) || [];
-      const timeline = (ctx.timeline as any[]) || [];
+      const patient = (ctx["patient"] as any) || {};
+      const vitals = (ctx["vitals"] as any[]) || [];
+      const rx = (ctx["prescriptions"] as any[]) || [];
+      const tests = (ctx["tests"] as any[]) || [];
+      const timeline = (ctx["timeline"] as any[]) || [];
 
       let responseText = "";
 

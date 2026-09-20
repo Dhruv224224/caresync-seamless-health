@@ -7,9 +7,6 @@ import {
   Copy,
   Check,
   Send,
-  FileText,
-  HelpCircle,
-  Stethoscope,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -110,31 +107,31 @@ export function AIActionButton({
         size={size}
         onClick={handleOpen}
         disabled={loading}
-        className={`border-brand/40 text-brand hover:bg-brand/10 hover:text-brand gap-1.5 cursor-pointer ${className}`}
+        className={`border-indigo-ai/30 text-indigo-ai dark:text-semantic-ai hover:bg-indigo-soft/60 dark:hover:bg-indigo-ai/15 hover:border-indigo-ai/50 gap-1.5 cursor-pointer shadow-2xs font-medium ${className}`}
       >
         {loading ? (
-          <Loader2 className="size-3.5 animate-spin text-brand" />
+          <Loader2 className="size-3.5 animate-spin text-indigo-ai" />
         ) : (
-          icon || <Sparkles className="size-3.5 text-calm" />
+          icon || <Sparkles className="size-3.5 text-indigo-ai" />
         )}
         <span>{label}</span>
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-xl max-h-[85vh] flex flex-col border border-border bg-card shadow-2xl overflow-hidden p-0">
-          <DialogHeader className="p-4 pb-3 border-b border-border bg-surf/50">
+        <DialogContent className="max-w-xl max-h-[85vh] flex flex-col border border-indigo-ai/20 dark:border-indigo-ai/30 bg-card shadow-xl overflow-hidden p-0">
+          <DialogHeader className="p-4 pb-3 border-b border-border bg-gradient-to-r from-indigo-soft/40 via-background to-transparent dark:from-indigo-soft/10 dark:via-card">
             <div className="flex items-center justify-between">
               <DialogTitle className="text-base font-bold text-ink flex items-center gap-2.5">
-                <div className="grid size-8 place-items-center rounded-lg bg-brand text-white shadow-sm">
+                <div className="grid size-8 place-items-center rounded-lg bg-indigo-ai text-white shadow-xs">
                   <Bot className="size-4" />
                 </div>
                 <span>{displayName}</span>
               </DialogTitle>
-              <span className="text-[10px] font-mono text-ink/50 bg-card px-2 py-0.5 rounded border border-border">
+              <span className="text-[10px] font-mono text-indigo-ai bg-indigo-soft dark:bg-indigo-ai/20 px-2 py-0.5 rounded border border-indigo-ai/20 font-medium">
                 CareSync AI Assistant
               </span>
             </div>
-            <DialogDescription className="text-xs text-ink/60 mt-1">
+            <DialogDescription className="text-xs text-slate-500 mt-1">
               {actionType === "ask"
                 ? "Ask natural-language questions about this patient's authorized records."
                 : "Continuous clinical intelligence and verified health record synthesis."}
@@ -145,7 +142,7 @@ export function AIActionButton({
           <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
             {actionType === "ask" && (
               <div className="space-y-2">
-                <div className="text-[11px] font-medium text-ink/70">Suggested Prompts:</div>
+                <div className="text-[11px] font-medium text-slate-700">Suggested Prompts:</div>
                 <div className="flex flex-wrap gap-1.5">
                   {[
                     "What tests are still pending?",
@@ -160,7 +157,7 @@ export function AIActionButton({
                         setQuery(preset);
                         runAI(preset);
                       }}
-                      className="px-2.5 py-1 rounded-full bg-surf hover:bg-brand/10 hover:text-brand text-[11px] text-ink/70 border border-border transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-full bg-surf hover:bg-blue-soft hover:text-navy-900 text-[11px] text-slate-700 border border-border transition-colors cursor-pointer"
                     >
                       {preset}
                     </button>
@@ -173,14 +170,14 @@ export function AIActionButton({
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && runAI()}
                     placeholder="Type your question about patient workflow..."
-                    className="flex-1 h-9 px-3 text-xs rounded-lg border border-border bg-surf focus:outline-none focus:border-brand"
+                    className="flex-1 h-9 px-3 text-xs rounded-lg border border-border bg-surf focus:outline-none focus:border-navy-600 font-sans"
                     disabled={loading}
                   />
                   <Button
                     size="sm"
                     onClick={() => runAI()}
                     disabled={loading || !query.trim()}
-                    className="bg-brand hover:bg-brand/90 text-white h-9 px-3"
+                    className="bg-navy-900 hover:bg-navy-800 text-white h-9 px-3"
                   >
                     {loading ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
                   </Button>
@@ -190,35 +187,35 @@ export function AIActionButton({
 
             {loading && (
               <div className="p-8 text-center space-y-2 bg-surf/50 rounded-xl border border-border">
-                <Loader2 className="size-6 animate-spin text-brand mx-auto" />
+                <Loader2 className="size-6 animate-spin text-navy-700 dark:text-blue-accent mx-auto" />
                 <div className="text-xs font-semibold text-ink">CareSync Assistant is synthesizing...</div>
-                <div className="text-[11px] font-mono text-ink/50">Retrieving authorized medical records</div>
+                <div className="text-[11px] font-mono text-slate-500">Retrieving authorized medical records</div>
               </div>
             )}
 
             {response && !loading && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-calm flex items-center gap-1.5">
-                    <Sparkles className="size-3 text-calm" /> AI-Generated Summary
+                  <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-teal-dark dark:text-calm flex items-center gap-1.5">
+                    <Sparkles className="size-3 text-teal-primary" /> AI-Generated Summary
                   </span>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={handleCopy}
-                    className="h-7 text-[11px] text-ink/60 hover:text-ink gap-1"
+                    className="h-7 text-[11px] text-slate-500 hover:text-ink gap-1"
                   >
                     {copied ? <Check className="size-3 text-calm" /> : <Copy className="size-3" />}
                     {copied ? "Copied" : "Copy"}
                   </Button>
                 </div>
 
-                <div className="rounded-xl bg-surf p-4 border border-border text-ink/90 whitespace-pre-wrap leading-relaxed font-sans text-xs">
+                <div className="rounded-xl bg-surf p-4 border border-border text-slate-900 dark:text-slate-100 whitespace-pre-wrap leading-relaxed font-sans text-xs">
                   {response}
                 </div>
 
-                <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-2.5 text-[11px] text-amber-800 dark:text-amber-200 flex items-start gap-2">
-                  <AlertCircle className="size-3.5 shrink-0 mt-0.5 text-amber-600" />
+                <div className="rounded-lg bg-amber-soft border border-amber-muted/30 p-2.5 text-[11px] text-amber-muted dark:text-warn flex items-start gap-2">
+                  <AlertCircle className="size-3.5 shrink-0 mt-0.5 text-amber-muted" />
                   <span>
                     <strong>Medical Safety Notice:</strong> AI responses are derived strictly from electronic records and are not a medical diagnosis. Clinicians and patients must refer to official test sheets and prescription orders.
                   </span>
@@ -227,7 +224,7 @@ export function AIActionButton({
             )}
           </div>
 
-          <div className="p-3 border-t border-border bg-surf/30 flex justify-between items-center">
+          <div className="p-3 border-t border-border bg-surf/50 flex justify-between items-center">
             {actionType !== "ask" && (
               <Button
                 variant="outline"
@@ -243,7 +240,7 @@ export function AIActionButton({
               <Button
                 size="sm"
                 onClick={() => setOpen(false)}
-                className="bg-brand text-white text-xs h-8 px-4"
+                className="bg-navy-900 hover:bg-navy-800 text-white text-xs h-8 px-4"
               >
                 Done
               </Button>

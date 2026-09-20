@@ -5,17 +5,15 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
+ * CARESYNC — GLOBAL DESIGN SYSTEM
  *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * Light Mode : Quiet Clinical Luxury (Porcelain, Ink Navy, Slate, Teal, Soft Blue)
+ * Dark Mode  : Nightshift Palette (#071019, #0B1623, #101F30, #162A3D, #1D354C),
+ *              Visible Cool-Blue Borders (#24394D, #314D66, #467FAF),
+ *              Soft Clinical Blue (#4EA0E8, #7DBBEE, #347FBE),
+ *              Restrained Teal (#43C7A0, #207D67, #12382F),
+ *              Indigo Flame for AI (#8177D6, #9A91F0, #252344),
+ *              Muted Amber (#D2A85A) & Muted Coral (#D3757D).
  */
 
 @theme inline {
@@ -26,6 +24,8 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Core Semantic UI Mappings */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -46,6 +46,67 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+
+  /* CareSync Functional Semantic Tokens */
+  --color-ink: var(--ink);
+  --color-brand: var(--brand);
+  --color-calm: var(--calm);
+  --color-surf: var(--surf);
+  --color-tealsoft: var(--tealsoft);
+  --color-warn: var(--warn);
+  --color-crit: var(--crit);
+
+  /* Primary Brand: Ink Navy System */
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-navy-600: var(--navy-600);
+  --color-navy-500: var(--navy-500);
+
+  /* Muted Teal System */
+  --color-teal-primary: var(--teal-primary);
+  --color-teal-dark: var(--teal-dark);
+  --color-teal-light: var(--teal-light);
+  --color-teal-soft: var(--teal-soft);
+
+  /* Soft Blue System */
+  --color-blue-accent: var(--blue-accent);
+  --color-blue-soft: var(--blue-soft);
+  --color-blue-hover: var(--blue-hover);
+
+  /* AI Indigo System */
+  --color-indigo-ai: var(--indigo-ai);
+  --color-indigo-soft: var(--indigo-soft);
+
+  /* Amber System */
+  --color-amber-muted: var(--amber-muted);
+  --color-amber-soft: var(--amber-soft);
+
+  /* Danger System */
+  --color-danger-muted: var(--danger-muted);
+  --color-danger-soft: var(--danger-soft);
+
+  /* Slate System */
+  --color-slate-900: var(--slate-900);
+  --color-slate-700: var(--slate-700);
+  --color-slate-500: var(--slate-500);
+  --color-slate-300: var(--slate-300);
+  --color-slate-200: var(--slate-200);
+
+  /* Extended Semantic Role Tokens */
+  --color-success: var(--semantic-success);
+  --color-success-soft: var(--semantic-success-soft);
+  --color-warning: var(--semantic-warning);
+  --color-warning-soft: var(--semantic-warning-soft);
+  --color-danger: var(--semantic-danger);
+  --color-danger-soft: var(--semantic-danger-soft);
+  --color-info: var(--semantic-info);
+  --color-info-soft: var(--semantic-info-soft);
+  --color-ai: var(--semantic-ai);
+  --color-ai-soft: var(--semantic-ai-soft);
+  --color-pharmacy: var(--semantic-pharmacy);
+  --color-pharmacy-soft: var(--semantic-pharmacy-soft);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -59,104 +120,238 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --color-ink: var(--ink);
-  --color-brand: var(--brand);
-  --color-calm: var(--calm);
-  --color-surf: var(--surf);
-  --color-tealsoft: var(--tealsoft);
-  --color-warn: var(--warn);
-  --color-crit: var(--crit);
+
   --font-sans: var(--font-sans-value);
   --font-mono: var(--font-mono-value);
 }
 
 :root {
   --radius: 0.5rem;
-  /* Light Theme Tokens */
-  --background: oklch(0.985 0.005 240);
-  --foreground: oklch(0.18 0.03 250);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.03 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.03 250);
-  --primary: oklch(0.36 0.14 250);
-  --primary-foreground: oklch(0.99 0.003 255);
-  --secondary: oklch(0.955 0.01 245);
-  --secondary-foreground: oklch(0.22 0.04 250);
-  --muted: oklch(0.945 0.008 245);
-  --muted-foreground: oklch(0.48 0.025 250);
-  --accent: oklch(0.94 0.035 185);
-  --accent-foreground: oklch(0.25 0.1 185);
-  --destructive: oklch(0.55 0.2 28);
-  --destructive-foreground: oklch(0.99 0.003 255);
-  --border: oklch(0.88 0.012 245);
-  --input: oklch(0.88 0.012 245);
-  --ring: oklch(0.4 0.14 250);
-  --ink: oklch(0.18 0.03 250);
-  --brand: oklch(0.36 0.14 250);
-  --calm: oklch(0.5 0.14 165);
-  --surf: oklch(0.975 0.006 245);
-  --tealsoft: oklch(0.92 0.04 165);
-  --warn: oklch(0.64 0.16 75);
-  --crit: oklch(0.56 0.2 28);
+
+  /* =========================================================================
+     1. INK NAVY PALETTE
+     ========================================================================= */
+  --navy-900: #0B1A2B;
+  --navy-800: #10253D;
+  --navy-700: #183653;
+  --navy-600: #23527A;
+  --navy-500: #316A98;
+
+  /* =========================================================================
+     2. MUTED TEAL (Healthcare Success & Completion Accent)
+     ========================================================================= */
+  --teal-primary: #2E8B84;
+  --teal-dark: #236D68;
+  --teal-light: #E3F2F0;
+  --teal-soft: #CFE9E5;
+
+  /* =========================================================================
+     3. SOFT BLUE (Clinical Information & Navigation)
+     ========================================================================= */
+  --blue-accent: #5F7EA3;
+  --blue-soft: #E8EFF7;
+  --blue-hover: #486A90;
+
+  /* =========================================================================
+     4. MUTED INDIGO (AI / Advanced Technology Only)
+     ========================================================================= */
+  --indigo-ai: #635B9B;
+  --indigo-soft: #EEECF7;
+
+  /* =========================================================================
+     5. MUTED AMBER & DANGER (Restrained Warnings & Critical States)
+     ========================================================= */
+  --amber-muted: #C6924A;
+  --amber-soft: #F7EFDF;
+  --danger-muted: #B85C63;
+  --danger-soft: #F7E8EA;
+
+  /* =========================================================================
+     6. SLATE COOL GRAYS
+     ========================================================================= */
+  --slate-900: #0F1B2D; /* Text Primary */
+  --slate-700: #536275; /* Text Secondary */
+  --slate-500: #7A8797; /* Text Muted */
+  --slate-300: #C8D2DE; /* Border Strong */
+  --slate-200: #DCE3EB; /* Border Subtle */
+  --slate-100: #A9B4C0; /* Disabled */
+
+  /* =========================================================================
+     LIGHT THEME SEMANTIC TOKENS (Porcelain + Ink Navy + Slate + Muted Teal)
+     ========================================================================= */
+  --background: #F7F9FC; /* Porcelain cool background */
+  --foreground: #0F1B2D; /* Slate 900 primary text */
+  --card: #FFFFFF;       /* Pure white surface */
+  --card-foreground: #0F1B2D;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F1B2D;
+
+  /* Primary Brand: Ink Navy */
+  --primary: #0B1A2B;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F2F5F9; /* Secondary Surface */
+  --secondary-foreground: #0F1B2D;
+  --muted: #EEF3F7;     /* Subtle Surface */
+  --muted-foreground: #536275; /* Slate 700 */
+  --accent: #E8EFF7;    /* Soft Blue Tint */
+  --accent-foreground: #10253D;
+  --destructive: #B85C63; /* Muted Red */
+  --destructive-foreground: #FFFFFF;
+
+  --border: #DCE3EB;     /* Subtle cool gray border */
+  --input: #DCE3EB;
+  --ring: #183653;
+
+  --ink: #0F1B2D;
+  --brand: #10253D;     /* Ink Navy Brand */
+  --calm: #2E8B84;      /* Muted Teal */
+  --surf: #F7F9FC;      /* Porcelain Page BG */
+  --tealsoft: #E3F2F0;  /* Teal Soft Surface */
+  --warn: #C6924A;      /* Muted Amber */
+  --crit: #B85C63;      /* Muted Red */
+
+  /* Semantic Extended */
+  --semantic-success: #2E8B84;
+  --semantic-success-soft: #E3F2F0;
+  --semantic-warning: #C6924A;
+  --semantic-warning-soft: #F7EFDF;
+  --semantic-danger: #B85C63;
+  --semantic-danger-soft: #F7E8EA;
+  --semantic-info: #5F7EA3;
+  --semantic-info-soft: #E8EFF7;
+  --semantic-ai: #635B9B;
+  --semantic-ai-soft: #EEECF7;
+  --semantic-pharmacy: #2E8B84;
+  --semantic-pharmacy-soft: #E3F2F0;
+
   --font-sans-value: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono-value: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --chart-1: oklch(0.36 0.14 250);
-  --chart-2: oklch(0.5 0.14 165);
-  --chart-3: oklch(0.64 0.16 75);
-  --chart-4: oklch(0.56 0.2 28);
-  --chart-5: oklch(0.44 0.09 280);
-  --sidebar: oklch(0.99 0.003 245);
-  --sidebar-foreground: oklch(0.18 0.03 250);
-  --sidebar-primary: oklch(0.36 0.14 250);
-  --sidebar-primary-foreground: oklch(0.99 0.003 255);
-  --sidebar-accent: oklch(0.95 0.01 245);
-  --sidebar-accent-foreground: oklch(0.18 0.03 250);
-  --sidebar-border: oklch(0.88 0.012 245);
-  --sidebar-ring: oklch(0.4 0.14 250);
+
+  --chart-1: #10253D; /* Ink Navy */
+  --chart-2: #2E8B84; /* Muted Teal */
+  --chart-3: #5F7EA3; /* Soft Blue */
+  --chart-4: #C6924A; /* Muted Amber */
+  --chart-5: #635B9B; /* Muted Indigo */
+
+  --sidebar: #FFFFFF; /* White / Porcelain sidebar */
+  --sidebar-foreground: #0F1B2D;
+  --sidebar-primary: #0B1A2B;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F2F5F9;
+  --sidebar-accent-foreground: #0B1A2B;
+  --sidebar-border: #DCE3EB;
+  --sidebar-ring: #183653;
 }
 
 .dark {
-  /* Dark Theme Tokens - Deep hospital slate, crisp readable text, visible borders */
-  --background: oklch(0.15 0.02 250);
-  --foreground: oklch(0.96 0.005 250);
-  --card: oklch(0.19 0.025 250);
-  --card-foreground: oklch(0.96 0.005 250);
-  --popover: oklch(0.2 0.025 250);
-  --popover-foreground: oklch(0.96 0.005 250);
-  --primary: oklch(0.62 0.16 250);
-  --primary-foreground: oklch(0.1 0.02 250);
-  --secondary: oklch(0.24 0.025 250);
-  --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.23 0.025 250);
-  --muted-foreground: oklch(0.72 0.02 250);
-  --accent: oklch(0.26 0.05 185);
-  --accent-foreground: oklch(0.88 0.08 185);
-  --destructive: oklch(0.65 0.18 28);
-  --destructive-foreground: oklch(0.99 0.003 255);
-  --border: oklch(0.28 0.02 250);
-  --input: oklch(0.28 0.02 250);
-  --ring: oklch(0.62 0.16 250);
-  --ink: oklch(0.96 0.005 250);
-  --brand: oklch(0.62 0.16 250);
-  --calm: oklch(0.72 0.13 165);
-  --surf: oklch(0.12 0.015 250);
-  --tealsoft: oklch(0.25 0.045 165);
-  --warn: oklch(0.76 0.14 75);
-  --crit: oklch(0.68 0.17 28);
-  --chart-1: oklch(0.62 0.16 250);
-  --chart-2: oklch(0.72 0.13 165);
-  --chart-3: oklch(0.76 0.14 75);
-  --chart-4: oklch(0.68 0.17 28);
-  --chart-5: oklch(0.6 0.09 280);
-  --sidebar: oklch(0.17 0.022 250);
-  --sidebar-foreground: oklch(0.96 0.005 250);
-  --sidebar-primary: oklch(0.62 0.16 250);
-  --sidebar-primary-foreground: oklch(0.1 0.02 250);
-  --sidebar-accent: oklch(0.23 0.025 250);
-  --sidebar-accent-foreground: oklch(0.96 0.005 250);
-  --sidebar-border: oklch(0.26 0.02 250);
-  --sidebar-ring: oklch(0.62 0.16 250);
+  /* =========================================================================
+     GLOBAL DARK MODE — NIGHTSHIFT REFERENCE SYSTEM
+     
+     Level 1 — Page Background : #09131F (Layered navy atmosphere, never #000000)
+     Level 2 — Section/Sidebar : #0D1927
+     Level 3 — Card            : #122033
+     Level 4 — Elevated/Modal  : #172A40
+     Level 5 — Selected/Active : #1A314A
+     
+     Borders  : Default #20374D | Strong #2C4B65 | Active #3F79A5 | Focus #5F9ED2
+     Text     : Primary #F4F7FB | Secondary #C7D2DE | Muted #91A1B2 | Very Muted #708295
+     Primary  : #3E8EDB (Hover #58A1E6, Active #3275B6, Light Highlight #73B8F4)
+     Success  : #43C99A (Dark #1D765F, Soft #12392F)
+     AI       : #7168C9 (Accent #8D84E6, Surface #211F3D, Border #443D73, Text #E4E1FF)
+     Warning  : #D0A25D / #CDA15E
+     Danger   : #D47A82 / #C96D77 / #D0777F
+     ========================================================================= */
+  --background: #09131F; /* Primary page background */
+  --foreground: #F4F7FB; /* Primary text: crisp and bright */
+  --card: #122033;       /* Level 3 Card Surface */
+  --card-foreground: #F4F7FB;
+  --popover: #172A40;    /* Level 4 Elevated Popover Surface */
+  --popover-foreground: #F4F7FB;
+
+  /* Primary Brand: Clinical Blue */
+  --primary: #3E8EDB;
+  --primary-foreground: #FFFFFF;
+  --secondary: #0D1927;  /* Level 2 Section / Atmospheric Tone */
+  --secondary-foreground: #C7D2DE;
+  --muted: #172A40;      /* Level 4 Elevated Surface */
+  --muted-foreground: #91A1B2;
+  --accent: #1A314A;     /* Level 5 Selected / Active Surface */
+  --accent-foreground: #73B8F4;
+  --destructive: #C96D77; /* Controlled Muted Danger */
+  --destructive-foreground: #FFFFFF;
+
+  --border: #20374D;     /* Default visible cool-navy border */
+  --input: #29445D;      /* Input border */
+  --ring: #5F9ED2;       /* Focus ring */
+
+  --ink: #F4F7FB;
+  --brand: #3E8EDB;      /* Clinical Blue */
+  --calm: #43C99A;       /* Success Teal */
+  --surf: #09131F;       /* Foundation Page */
+  --tealsoft: #12392F;   /* Soft Teal Surface */
+  --warn: #D0A25D;       /* Warning Amber */
+  --crit: #D47A82;       /* Urgent / Danger Coral */
+
+  /* Palette mappings */
+  --navy-900: #09131F;
+  --navy-800: #0D1927;
+  --navy-700: #122033;
+  --navy-600: #172A40;
+  --navy-500: #3E8EDB;
+
+  --teal-primary: #43C99A;
+  --teal-dark: #1D765F;
+  --teal-light: #12392F;
+  --teal-soft: #12392F;
+
+  --blue-accent: #73B8F4;
+  --blue-soft: #172A40;
+  --blue-hover: #58A1E6;
+
+  --indigo-ai: #7168C9;
+  --indigo-soft: #211F3D;
+
+  --amber-muted: #D0A25D;
+  --amber-soft: #2B2418;
+  --danger-muted: #D47A82;
+  --danger-soft: #2D1B1F;
+
+  --slate-900: #F4F7FB; /* Primary text */
+  --slate-700: #C7D2DE; /* Secondary text */
+  --slate-500: #91A1B2; /* Muted text */
+  --slate-300: #2C4B65; /* Border strong */
+  --slate-200: #20374D; /* Border default */
+  --slate-100: #708295; /* Very muted text */
+
+  /* Semantic Extended */
+  --semantic-success: #43C99A;
+  --semantic-success-soft: #12392F;
+  --semantic-warning: #D0A25D;
+  --semantic-warning-soft: #2B2418;
+  --semantic-danger: #D47A82;
+  --semantic-danger-soft: #2D1B1F;
+  --semantic-info: #73B8F4;
+  --semantic-info-soft: #172A40;
+  --semantic-ai: #7168C9;
+  --semantic-ai-soft: #211F3D;
+  --semantic-pharmacy: #43C99A;
+  --semantic-pharmacy-soft: #12392F;
+
+  --chart-1: #3E8EDB;
+  --chart-2: #43C99A;
+  --chart-3: #73B8F4;
+  --chart-4: #D0A25D;
+  --chart-5: #7168C9;
+
+  /* Sidebar Tokens */
+  --sidebar: #0D1927;
+  --sidebar-foreground: #9CADBD;
+  --sidebar-primary: #3E8EDB;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #172A40;
+  --sidebar-accent-foreground: #F4F7FB;
+  --sidebar-border: #20374D;
+  --sidebar-ring: #5F9ED2;
 }
 
 @layer base {
@@ -171,10 +366,40 @@
     letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
   }
 
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Dark mode input background: Nightshift #0D1927 with #29445D border */
+  .dark input:not([type="checkbox"]):not([type="radio"]),
+  .dark textarea,
+  .dark select {
+    background-color: #0D1927;
+    border-color: #29445D;
+    color: #F4F7FB;
+  }
+
+  .dark input:hover,
+  .dark textarea:hover,
+  .dark select:hover {
+    border-color: #35536D;
+  }
+
+  .dark input:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    border-color: #3E8EDB;
+    outline: none;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #758799;
   }
 }
 

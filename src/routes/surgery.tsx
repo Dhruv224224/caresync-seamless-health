@@ -83,15 +83,15 @@ function SurgeryWorkflowPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-ink/50">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-slate-500">
               <span>Operation Theatre Suite 2</span>
               <span>•</span>
-              <span className="text-calm font-medium">Live Surgical Workflow</span>
+              <span className="text-teal-primary font-medium">Live Surgical Workflow</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink mt-0.5">
               Surgery & Admission Milestone Tracker
             </h1>
-            <p className="text-xs text-ink/60 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Live progression from admission to post-op recovery and discharge.
             </p>
           </div>
@@ -101,15 +101,15 @@ function SurgeryWorkflowPage() {
         <Card className="border-border bg-card shadow-xs">
           <CardContent className="p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-start sm:items-center gap-4">
-              <div className="size-14 rounded-2xl bg-crit/15 text-crit font-bold text-lg grid place-items-center shrink-0 border border-crit/20">
+              <div className="size-14 rounded-2xl bg-danger-soft text-danger-muted font-bold text-lg grid place-items-center shrink-0 border border-danger-muted/20 dark:bg-danger-soft/20">
                 <Activity className="size-7" />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-3">
                   <h2 className="text-xl font-bold text-ink">{surgery.procedureName}</h2>
-                  <Badge className="bg-brand/15 text-brand border-brand/30">{surgery.status}</Badge>
+                  <Badge variant="info">{surgery.status}</Badge>
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-4 text-xs text-ink/70">
+                <div className="mt-1 flex flex-wrap items-center gap-4 text-xs text-slate-700 dark:text-slate-300">
                   <span>
                     <strong>Patient:</strong> {surgery.patientName} ({surgery.patientId})
                   </span>
@@ -125,8 +125,8 @@ function SurgeryWorkflowPage() {
               </div>
             </div>
 
-            <div className="text-right text-xs bg-surf p-3 rounded-xl border border-border">
-              <div className="font-mono text-ink/50">Scheduled Window</div>
+            <div className="text-right text-xs bg-secondary p-3 rounded-xl border border-border">
+              <div className="font-mono text-slate-500">Scheduled Window</div>
               <div className="font-bold text-ink text-sm mt-0.5">{surgery.scheduledDate}</div>
             </div>
           </CardContent>
@@ -134,12 +134,12 @@ function SurgeryWorkflowPage() {
 
         {/* Chronological Milestone Timeline */}
         <Card className="border-border bg-card shadow-xs">
-          <CardHeader className="p-4 border-b border-border/60">
+          <CardHeader className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-bold text-ink">
                 Surgical Journey Milestones
               </CardTitle>
-              <span className="text-xs font-mono text-calm bg-tealsoft px-2.5 py-1 rounded-full">
+              <span className="text-xs font-mono text-teal-dark dark:text-calm bg-teal-light dark:bg-teal-primary/20 border border-teal-primary/30 px-3 py-1 rounded-full font-semibold">
                 Step 6 of 9 In Progress
               </span>
             </div>
@@ -156,10 +156,10 @@ function SurgeryWorkflowPage() {
                   <span
                     className={`absolute -left-6 top-1 sm:top-auto size-5 rounded-full border-2 border-card flex items-center justify-center text-[10px] text-white shadow-xs ${
                       milestone.status === "completed"
-                        ? "bg-calm"
+                        ? "bg-teal-primary"
                         : milestone.status === "in_progress"
-                          ? "bg-brand ring-4 ring-brand/15"
-                          : "bg-ink/30"
+                          ? "bg-navy-900 dark:bg-primary ring-4 ring-navy-900/20"
+                          : "bg-slate-300 dark:bg-slate-700"
                     }`}
                   >
                     {milestone.status === "completed"
@@ -172,7 +172,7 @@ function SurgeryWorkflowPage() {
                   {/* Content */}
                   <div className="space-y-0.5">
                     <div className="font-semibold text-sm text-ink">{milestone.title}</div>
-                    <div className="text-xs font-mono text-ink/50">
+                    <div className="text-xs font-mono text-slate-500">
                       {milestone.timestamp
                         ? `Completed at ${milestone.timestamp}`
                         : milestone.status === "in_progress"
@@ -184,19 +184,19 @@ function SurgeryWorkflowPage() {
                   {/* Status / Action Button */}
                   <div>
                     {milestone.status === "completed" ? (
-                      <Badge className="bg-calm/15 text-calm border-calm/30 text-[10px] font-mono">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-teal-light dark:bg-teal-primary/20 text-teal-dark dark:text-calm border border-teal-primary/30 text-[10px] font-mono font-semibold">
                         ✓ COMPLETED
-                      </Badge>
+                      </span>
                     ) : milestone.status === "in_progress" ? (
                       <Button
                         size="sm"
                         onClick={() => handleNextMilestone(idx)}
-                        className="bg-brand hover:bg-brand/90 text-white text-xs h-8 shadow-xs"
+                        className="bg-navy-900 hover:bg-navy-800 dark:bg-primary dark:text-navy-900 text-white text-xs h-8 shadow-xs cursor-pointer"
                       >
                         Advance Milestone <ArrowRight className="size-3.5 ml-1" />
                       </Button>
                     ) : (
-                      <Badge variant="outline" className="text-[10px] font-mono text-ink/40">
+                      <Badge variant="outline" className="text-[10px] font-mono text-slate-400">
                         UPCOMING
                       </Badge>
                     )}
