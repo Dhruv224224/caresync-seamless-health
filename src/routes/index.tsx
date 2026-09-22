@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/care-sync/Logo";
 import { SectionLabel } from "@/components/care-sync/SectionLabel";
 import { useTheme } from "@/components/care-sync/ThemeToggle";
+import { useCurrentTime } from "@/hooks/useCurrentTime";
 import { Role } from "@/types/caresync";
 
 export const Route = createFileRoute("/")({
@@ -71,15 +72,9 @@ const problems = [
   },
   {
     code: "03",
-    title: "Delayed Diagnostic Turnaround",
-    copy: "Paper-based lab test orders require physical runners, slowing emergency surgical and treatment decisions.",
-    stat: "Hours lost awaiting reports",
-  },
-  {
-    code: "04",
-    title: "Fragmented Patient Timeline",
-    copy: "Patients cannot access their full treatment journey, leaving families anxious and misinformed.",
-    stat: "Zero visibility for patients",
+    title: "Zero Longitudinal Tracking",
+    copy: "Care milestones are fragmented across departments with no single unified timeline from admission to discharge.",
+    stat: "Disjointed patient journey",
   },
 ];
 
@@ -164,13 +159,20 @@ const roles = [
 function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { resolvedTheme, toggleTheme } = useTheme();
+  const liveTime = useCurrentTime({ intervalMs: 1000 });
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-brand/20">
       {/* Global Navigation Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-card/90 dark:bg-[#05070A]/95 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Logo />
+          <div className="flex items-center gap-3">
+            <Logo />
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/70 border border-border text-[11px] font-mono text-muted-foreground">
+              <Clock className="size-3 text-brand animate-pulse" />
+              <span>{liveTime.timeString}</span>
+            </div>
+          </div>
 
           <nav className="hidden items-center gap-7 text-xs font-semibold text-slate-700 dark:text-[#F1F5F9] md:flex">
             <a

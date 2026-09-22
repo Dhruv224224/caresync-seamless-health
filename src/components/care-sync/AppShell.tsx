@@ -37,7 +37,9 @@ import { AIActionButton } from "@/components/care-sync/AIActionButton";
 import { useTheme } from "@/components/care-sync/ThemeToggle";
 import { useCareSync, getRoleHomePath } from "@/lib/store";
 import { buildCareSyncContext } from "@/lib/ai/context";
+import { useCurrentTime } from "@/hooks/useCurrentTime";
 import { Role } from "@/types/caresync";
+import { Clock } from "lucide-react";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -49,6 +51,7 @@ interface AppShellProps {
 export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const liveTime = useCurrentTime({ intervalMs: 1000 });
   const storeState = useCareSync();
   const {
     currentRole,
@@ -241,6 +244,14 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               <div className="hidden md:flex items-center gap-2 pl-3 border-l border-border text-xs text-muted-foreground">
                 <Building2 className="size-3.5 text-brand" />
                 <span className="font-medium text-foreground/90">CareSync Hospital · Main Facility</span>
+              </div>
+              {/* Real-time Hospital Clock */}
+              <div
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/80 border border-border text-[11px] font-mono text-foreground/90 shadow-2xs"
+                title={`Live Hospital System Time (${liveTime.dateString})`}
+              >
+                <Clock className="size-3 text-brand animate-pulse" />
+                <span>{liveTime.timeString}</span>
               </div>
             </div>
 
@@ -445,7 +456,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
           </aside>
 
           {/* Main Dynamic View Area */}
-          <main className="min-w-0 flex-1 p-3.5 sm:p-5 lg:p-6">
+          <main key={location.pathname} className="min-w-0 flex-1 p-3.5 sm:p-5 lg:p-6 @page-enter">
             {!isRoleAuthorized ? (
               <div className="p-8 text-center bg-card rounded-2xl border border-border shadow-xs space-y-3 max-w-lg mx-auto mt-10">
                 <ShieldAlert className="size-10 text-warn mx-auto" />

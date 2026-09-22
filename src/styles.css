@@ -442,7 +442,17 @@
 @keyframes sync-rise {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -451,10 +461,28 @@
 }
 
 @utility sync-rise {
-  animation: sync-rise 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: sync-rise 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@utility page-enter {
+  animation: page-enter 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @utility sync-dash {
   animation: sync-dash 1.6s linear infinite;
+}
+
+/* Micro-interactions: Active button click bounce, card transitions */
+button:active:not(:disabled),
+a[role="button"]:active:not([aria-disabled="true"]),
+.btn-interactive:active {
+  transform: scale(0.985);
+  transition: transform 120ms ease-out;
+}
+
+.card-interactive {
+  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 160ms ease-out, border-color 160ms ease-out;
+}
+.card-interactive:hover {
+  transform: translateY(-1px);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -464,5 +492,6 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
+    transform: none !important;
   }
 }
