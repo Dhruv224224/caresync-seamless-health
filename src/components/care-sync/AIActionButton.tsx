@@ -17,6 +17,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { invokeCareSyncAI, AIActionType } from "@/lib/aiService";
+import { AI_ACTION_REGISTRY } from "@/lib/aiRegistry";
 import { toast } from "sonner";
 
 interface AIActionButtonProps {
@@ -52,7 +53,14 @@ export function AIActionButton({
   const [response, setResponse] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const displayName = featureName || label;
+  const registryDef = AI_ACTION_REGISTRY[actionType];
+  const displayName = featureName || registryDef?.name || label;
+  const suggestedPrompts = registryDef?.suggestedPrompts || [
+    "What tests are still pending?",
+    "Summarize recent vitals and care status",
+    "What active medicines are prescribed?",
+    "Which doctor and ward is assigned?",
+  ];
 
   const handleOpen = async () => {
     setOpen(true);
@@ -133,8 +141,8 @@ export function AIActionButton({
             </div>
             <DialogDescription className="text-xs text-slate-500 mt-1">
               {actionType === "ask"
-                ? "Ask natural-language questions about this patient's authorized records."
-                : "Continuous clinical intelligence and verified health record synthesis."}
+                ? "Ask natural-language questions about this patient's authorized records and clinical queue."
+                : registryDef?.description || "Continuous clinical intelligence and verified health record synthesis."}
             </DialogDescription>
           </DialogHeader>
 
@@ -142,14 +150,9 @@ export function AIActionButton({
           <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
             {actionType === "ask" && (
               <div className="space-y-2">
-                <div className="text-[11px] font-medium text-slate-700">Suggested Prompts:</div>
+                <div className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Suggested Prompts:</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {[
-                    "What tests are still pending?",
-                    "Summarize recent vitals and care status",
-                    "What active medicines are prescribed?",
-                    "Which doctor and ward is assigned?",
-                  ].map((preset, idx) => (
+                  {suggestedPrompts.map((preset, idx) => (
                     <button
                       key={idx}
                       type="button"
@@ -157,7 +160,7 @@ export function AIActionButton({
                         setQuery(preset);
                         runAI(preset);
                       }}
-                      className="px-2.5 py-1 rounded-full bg-surf hover:bg-blue-soft hover:text-navy-900 text-[11px] text-slate-700 border border-border transition-colors cursor-pointer"
+                      className="px-2.5 py-1 rounded-full bg-surf hover:bg-blue-soft hover:text-navy-900 text-[11px] text-slate-700 dark:text-slate-300 border border-border transition-colors cursor-pointer"
                     >
                       {preset}
                     </button>
@@ -169,7 +172,7 @@ export function AIActionButton({
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && runAI()}
-                    placeholder="Type your question about patient workflow..."
+                    placeholder="Type your question in plain English..."
                     className="flex-1 h-9 px-3 text-xs rounded-lg border border-border bg-surf focus:outline-none focus:border-navy-600 font-sans"
                     disabled={loading}
                   />
@@ -177,7 +180,7 @@ export function AIActionButton({
                     size="sm"
                     onClick={() => runAI()}
                     disabled={loading || !query.trim()}
-                    className="bg-navy-900 hover:bg-navy-800 text-white h-9 px-3"
+                    className="bg-navy-900 hover:bg-navy-800 text-white h-9 px-3 cursor-pointer"
                   >
                     {loading ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
                   </Button>
@@ -217,7 +220,7 @@ export function AIActionButton({
                 <div className="rounded-lg bg-amber-soft border border-amber-muted/30 p-2.5 text-[11px] text-amber-muted dark:text-warn flex items-start gap-2">
                   <AlertCircle className="size-3.5 shrink-0 mt-0.5 text-amber-muted" />
                   <span>
-                    <strong>Medical Safety Notice:</strong> AI responses are derived strictly from electronic records and are not a medical diagnosis. Clinicians and patients must refer to official test sheets and prescription orders.
+                    <strong>Medical Safety Notice:</strong> {registryDef?.safetyAdvisory || "AI responses are derived strictly from electronic records and are not a medical diagnosis. Clinicians and patients must refer to official test sheets and prescription orders."}
                   </span>
                 </div>
               </div>
@@ -240,7 +243,7 @@ export function AIActionButton({
               <Button
                 size="sm"
                 onClick={() => setOpen(false)}
-                className="bg-navy-900 hover:bg-navy-800 text-white text-xs h-8 px-4"
+                className="bg-navy-900 hover:bg-navy-800 text-white text-xs h-8 px-4 cursor-pointer"
               >
                 Done
               </Button>

@@ -130,13 +130,25 @@ function ReceptionistDashboardPage() {
             </p>
           </div>
 
-          {/* Registration Dialog */}
-          <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-brand hover:bg-brand/90 text-primary-foreground text-xs h-8 px-3.5 shadow-xs">
-                <UserPlus className="size-3.5 mr-1.5" /> Register New Patient
-              </Button>
-            </DialogTrigger>
+          <div className="flex flex-wrap items-center gap-2">
+            <AIActionButton
+              label="Operational Summary"
+              featureName="Front Desk & Triage Operations Summary"
+              actionType="reception_summary"
+              role="receptionist"
+              getContextData={() => ({
+                patients,
+              })}
+              className="text-xs h-8"
+            />
+
+            {/* Registration Dialog */}
+            <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-brand hover:bg-brand/90 text-primary-foreground text-xs h-8 px-3.5 shadow-xs">
+                  <UserPlus className="size-3.5 mr-1.5" /> Register New Patient
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-lg border border-border bg-card shadow-2xl">
               <DialogHeader className="border-b border-border pb-3">
                 <DialogTitle className="text-base font-bold text-ink flex items-center gap-2">
@@ -281,6 +293,7 @@ function ReceptionistDashboardPage() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* 4 Metrics */}

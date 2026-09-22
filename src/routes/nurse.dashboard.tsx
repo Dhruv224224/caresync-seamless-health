@@ -23,6 +23,9 @@ import { useCareSync } from "@/lib/store";
 import { Patient } from "@/types/caresync";
 import { toast } from "sonner";
 
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
+import { exportPatientSummaryPdf } from "@/lib/pdfGenerator";
+
 export const Route = createFileRoute("/nurse/dashboard")({
   head: () => ({
     meta: [{ title: "Nursing Station & Inpatient Ward | CareSync" }],
@@ -84,6 +87,20 @@ function NurseDashboardPage() {
             <p className="text-xs text-ink/60">
               Manage inpatient bed assignments, perform scheduled rounds, and log vital signs.
             </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <AIActionButton
+              label="Nursing Rounds Summary"
+              featureName="Ward 3B Nursing Assistant"
+              actionType="nursing_summary"
+              role="nurse"
+              getContextData={() => ({
+                patients: admittedPatients,
+                vitals,
+              })}
+              className="text-xs h-8"
+            />
           </div>
         </div>
 
@@ -226,17 +243,35 @@ function NurseDashboardPage() {
                       </div>
                     )}
 
-                    <div className="pt-2 flex items-center justify-between">
+                    <div className="pt-2 flex items-center justify-between gap-2">
                       <span className="text-[10px] font-mono text-ink/50">
                         Next vitals due: 14:00
                       </span>
-                      <Button
-                        onClick={() => handleOpenVitalsModal(patient)}
-                        size="sm"
-                        className="bg-brand hover:bg-brand/90 text-primary-foreground text-xs h-7 px-3"
-                      >
-                        <HeartPulse className="size-3.5 mr-1" /> Record Vitals
-                      </Button>
+                      <div className="flex items-center gap-1.5">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const patientVitals = vitals.filter((v) => v.patientId === patient.id);
+                            exportPatientSummaryPdf({
+                              patient,
+                              vitals: patientVitals,
+                            });
+                            toast.success(`Patient Chart for ${patient.name} downloaded as PDF`);
+                          }}
+                          className="text-xs h-7 px-2 border-border bg-card text-ink hover:bg-surf"
+                          title="Download Patient Chart PDF"
+                        >
+                          PDF
+                        </Button>
+                        <Button
+                          onClick={() => handleOpenVitalsModal(patient)}
+                          size="sm"
+                          className="bg-brand hover:bg-brand/90 text-primary-foreground text-xs h-7 px-3"
+                        >
+                          <HeartPulse className="size-3.5 mr-1" /> Record Vitals
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

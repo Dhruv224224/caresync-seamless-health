@@ -16,6 +16,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCareSync } from "@/lib/store";
 import { toast } from "sonner";
 
+import { AIActionButton } from "@/components/care-sync/AIActionButton";
+
 export const Route = createFileRoute("/surgery")({
   head: () => ({
     meta: [{ title: "Surgery & Admission Workflow Tracker | CareSync" }],
@@ -94,6 +96,20 @@ function SurgeryWorkflowPage() {
             <p className="text-xs text-slate-500 mt-0.5">
               Live progression from admission to post-op recovery and discharge.
             </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <AIActionButton
+              label="Surgical Summary"
+              featureName="Live Surgical Progress Assistant"
+              actionType="surgery_summary"
+              role="doctor"
+              patientId={surgery.patientId}
+              getContextData={() => ({
+                surgery,
+              })}
+              className="text-xs h-8"
+            />
           </div>
         </div>
 

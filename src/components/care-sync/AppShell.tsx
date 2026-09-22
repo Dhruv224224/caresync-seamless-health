@@ -36,6 +36,7 @@ import { GlobalSearchDialog } from "@/components/care-sync/GlobalSearchDialog";
 import { AIActionButton } from "@/components/care-sync/AIActionButton";
 import { useTheme } from "@/components/care-sync/ThemeToggle";
 import { useCareSync, getRoleHomePath } from "@/lib/store";
+import { buildCareSyncContext } from "@/lib/ai/context";
 import { Role } from "@/types/caresync";
 
 interface AppShellProps {
@@ -48,6 +49,7 @@ interface AppShellProps {
 export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const storeState = useCareSync();
   const {
     currentRole,
     currentUser,
@@ -58,7 +60,7 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
     prescriptions,
     testOrders,
     patients,
-  } = useCareSync();
+  } = storeState;
   const { resolvedTheme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -259,20 +261,19 @@ export function AppShell({ children, activeRole, pageTitle, pageSubtitle }: AppS
               {/* AI Assistant Functional Button */}
               <AIActionButton
                 label="Ask CareSync"
-                featureName="CareSync Hospital Operations Assistant"
+                featureName="CareSync Hospital Assistant"
                 actionType="ask"
                 role={role}
-                patientId="CS-001"
-                getContextData={() => {
-                  const targetPatient = patients[0] || { id: "CS-001", name: "Rajesh Sharma" };
-                  return {
-                    patient: targetPatient,
-                    prescriptions: prescriptions.filter((p) => p.patientId === targetPatient.id),
-                    tests: testOrders.filter((t) => t.patientId === targetPatient.id),
+                getContextData={() =>
+                  buildCareSyncContext({
+                    state: storeState,
                     role,
-                  };
-                }}
-                className="hidden xl:flex text-xs h-8 px-2.5"
+                    pageContext: {
+                      currentPath: location.pathname,
+                    },
+                  })
+                }
+                className="hidden md:flex text-xs h-8 px-2.5"
               />
 
               {/* Dark / Light Mode Toggle Button */}
